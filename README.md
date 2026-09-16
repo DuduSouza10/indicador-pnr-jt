@@ -72,3 +72,5 @@ python app.py
 - Ranking por RM agora é ordenado pela quantidade total de reclamações no período, do maior para o menor.
 - Ranking por Base/Franquia também é ordenado pela quantidade total de reclamações no período, do maior para o menor.
 - Taxa PNR e variação D-1 continuam exibidas como métricas, mas não definem mais a posição no ranking.
+
+- No Ranking por RM, a coluna **Base** foi renomeada para **Base mais ofensora** (inclusive na exportacao XLSX e na traducao para chines simplificado).

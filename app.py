@@ -1014,7 +1014,7 @@ def export_tables():
                 base_rows.append([i, row["base"], row.get("supervisor"), row["station"], row["count"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
             append_write_sheet(wb, "网点排名" if lang == "zh-CN" else "Ranking Bases", base_headers, base_rows)
         else:
-            rm_headers = ["排名", "RM", "网点", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "Base", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
+            rm_headers = ["排名", "RM", "投诉最多网点", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "Base mais ofensora", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
             rm_rows = []
             for i, row in enumerate(dashboard["rm_ranking"], 1):
                 rm_rows.append([i, row["rm"], row.get("base"), row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
