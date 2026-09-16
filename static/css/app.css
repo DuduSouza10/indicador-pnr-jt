@@ -421,3 +421,22 @@ footer { color: #8b9097; }
   .toolbar-actions { flex-wrap: wrap; }
   .toolbar-actions button { flex: 1 1 145px; }
 }
+
+/* Cross-filter por clique */
+.cross-clickable { cursor: pointer; transition: border-color .16s ease, box-shadow .16s ease, transform .16s ease; }
+.cross-clickable:hover { border-color: rgba(237,28,36,.34); box-shadow: 0 10px 28px rgba(28,36,48,.08); transform: translateY(-1px); }
+.cross-clickable:focus-visible { outline: 3px solid rgba(237,28,36,.18); outline-offset: 2px; }
+.kpi-card.cross-active { border-color: rgba(237,28,36,.5); box-shadow: 0 0 0 2px rgba(237,28,36,.08), 0 10px 28px rgba(28,36,48,.08); }
+.click-filter-bar { display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -4px 0 18px; padding: 10px 12px; border: 1px solid rgba(237,28,36,.16); border-radius: 14px; background: rgba(237,28,36,.035); }
+.click-filter-bar[hidden] { display: none; }
+.click-filter-summary { display: flex; align-items: center; gap: 10px; min-width: 0; flex-wrap: wrap; }
+.click-filter-label { color: #6f747c; font-size: 10px; font-weight: 800; letter-spacing: .09em; text-transform: uppercase; }
+.click-filter-chips { display: flex; gap: 7px; flex-wrap: wrap; min-width: 0; }
+.click-filter-chip { display: inline-flex; align-items: center; min-height: 27px; max-width: min(360px, 72vw); padding: 5px 9px; border-radius: 999px; background: #fff; border: 1px solid rgba(237,28,36,.18); color: #4a4f56; font-size: 11px; font-weight: 700; white-space: nowrap; overflow: hidden; text-overflow: ellipsis; }
+.compact-btn { min-height: 32px; padding: 6px 10px; font-size: 11px; }
+.data-table tbody tr.cross-row, .rank-row.cross-row, .spark-col.cross-row { cursor: pointer; }
+.data-table tbody tr.cross-row:focus-visible, .rank-row.cross-row:focus-visible, .spark-col.cross-row:focus-visible { outline: 2px solid rgba(237,28,36,.3); outline-offset: -2px; }
+.data-table tbody tr.cross-selected td { background: rgba(237,28,36,.055); }
+.rank-row.cross-selected { padding: 4px 6px; margin: -4px -6px; border-radius: 9px; background: rgba(237,28,36,.055); }
+.spark-col.cross-selected .spark-bar { box-shadow: 0 0 0 2px rgba(237,28,36,.22); }
+@media (max-width: 620px) { .click-filter-bar { align-items: flex-start; flex-direction: column; } .compact-btn { width: 100%; } }

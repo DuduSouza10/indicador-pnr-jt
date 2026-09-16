@@ -266,11 +266,27 @@ def build_conditions(args):
         "station": PNRRecord.station,
         "base": PNRRecord.base,
         "atendimento": PNRRecord.atendimento,
+        # Filtros aplicados ao clicar nos rankings/cards do dashboard.
+        "driver": PNRRecord.driver,
+        "order_source": PNRRecord.order_source,
     }
     for arg_name, column in mapping.items():
         value = clean_text(args.get(arg_name))
         if value and value != "__all__":
             cond.append(column == value)
+
+    if clean_text(args.get("has_base")) == "1":
+        cond.extend([
+            PNRRecord.base.is_not(None),
+            func.trim(PNRRecord.base) != "",
+            PNRRecord.base != "Não informado",
+        ])
+    if clean_text(args.get("has_driver")) == "1":
+        cond.extend([
+            PNRRecord.driver.is_not(None),
+            func.trim(PNRRecord.driver) != "",
+            PNRRecord.driver != "Não informado",
+        ])
     return cond
 
 

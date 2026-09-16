@@ -14,6 +14,7 @@ Dashboard web em **tema claro**, preparado para rodar localmente ou no Railway c
 - **Top 10 Motoristas** ofensores.
 - **Top 10 Origens do Pedido**.
 - Evolução diária do PNR.
+- **Cross-filter por clique**: cartões de Base Própria/Franquia, ranking por RM, Top 10 de bases, motoristas, origens e barras diárias podem ser clicados para filtrar os demais indicadores; clicar novamente no mesmo item remove o recorte quando aplicável.
 - Botão **Exportar tabelas XLSX**, respeitando os filtros ativos.
 - Upload de nova planilha diretamente no dashboard.
 - Aba separada **Editar planilha**, com edição inline, inclusão e exclusão de linhas, filtros próprios, busca e paginação.

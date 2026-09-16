@@ -68,12 +68,17 @@
       </section>
 
       <section class="kpi-grid" id="kpiGrid">
-        <article class="kpi-card primary-kpi"><div class="kpi-label" data-i18n="pnrPeriod">PNR NO PERÍODO</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-foot" data-i18n="totalTickets">Total de tickets no recorte</div></article>
-        <article class="kpi-card"><div class="kpi-label" data-i18n="ownBase">BASE PRÓPRIA</div><div class="kpi-value" id="kpiOwn">—</div><div class="kpi-foot"><span id="kpiOwnPct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
-        <article class="kpi-card"><div class="kpi-label" data-i18n="franchise">FRANQUIA</div><div class="kpi-value" id="kpiFranchise">—</div><div class="kpi-foot"><span id="kpiFranchisePct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
-        <article class="kpi-card"><div class="kpi-label" data-i18n="basesInvolved">BASES ENVOLVIDAS</div><div class="kpi-value" id="kpiBases">—</div><div class="kpi-foot" data-i18n="stationsWithPnr">Estações com PNR no período</div></article>
-        <article class="kpi-card"><div class="kpi-label" data-i18n="drivers">MOTORISTAS</div><div class="kpi-value" id="kpiDrivers">—</div><div class="kpi-foot" data-i18n="distinctDrivers">Motoristas distintos</div></article>
+        <article class="kpi-card primary-kpi cross-clickable" data-kpi-filter="total" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="pnrPeriod">PNR NO PERÍODO</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-foot" data-i18n="totalTickets">Total de tickets no recorte</div></article>
+        <article class="kpi-card cross-clickable" data-kpi-filter="own" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="ownBase">BASE PRÓPRIA</div><div class="kpi-value" id="kpiOwn">—</div><div class="kpi-foot"><span id="kpiOwnPct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
+        <article class="kpi-card cross-clickable" data-kpi-filter="franchise" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="franchise">FRANQUIA</div><div class="kpi-value" id="kpiFranchise">—</div><div class="kpi-foot"><span id="kpiFranchisePct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
+        <article class="kpi-card cross-clickable" data-kpi-filter="bases" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="basesInvolved">BASES ENVOLVIDAS</div><div class="kpi-value" id="kpiBases">—</div><div class="kpi-foot" data-i18n="stationsWithPnr">Estações com PNR no período</div></article>
+        <article class="kpi-card cross-clickable" data-kpi-filter="drivers" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="drivers">MOTORISTAS</div><div class="kpi-value" id="kpiDrivers">—</div><div class="kpi-foot" data-i18n="distinctDrivers">Motoristas distintos</div></article>
       </section>
+
+      <div class="click-filter-bar" id="clickFilterBar" hidden>
+        <div class="click-filter-summary"><span class="click-filter-label" data-i18n="clickFilter">Filtro por clique</span><div id="clickFilterChips" class="click-filter-chips"></div></div>
+        <button class="ghost-btn compact-btn" id="clearClickFiltersBtn" type="button" data-i18n="clearClickFilters">Limpar seleção</button>
+      </div>
 
       <section class="grid-2">
         <article class="panel data-panel">

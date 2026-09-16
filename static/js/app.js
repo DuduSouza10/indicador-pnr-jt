@@ -7,6 +7,7 @@ const state = {
   watchTimer: null,
   activeView: 'dashboard',
   lang: localStorage.getItem('pnr_lang') === 'zh-CN' ? 'zh-CN' : 'pt-BR',
+  clickFilters: { driver: '', order_source: '', has_base: false, has_driver: false },
   editor: { loaded: false, loading: false, page: 1, pages: 1, total: 0 },
 };
 
@@ -17,6 +18,7 @@ const I18N = {
     operationalControl: 'CONTROLE OPERACIONAL', pnrIndicatorPrefix: 'Indicador de', subtitle: 'Visão consolidada de ocorrências, estações e ofensores por período.',
     autoUpdateActive: 'Atualização automática ativa', reconnecting: 'Reconectando atualização automática', lastUpdate: 'Última atualização', source: 'Fonte',
     dashboardTab: 'Dashboard', editorTab: 'Editar planilha', filters: 'FILTROS', globalCut: 'Recorte global', clearFilters: 'Limpar filtros', exportXlsx: 'Exportar tabelas XLSX', updateData: 'Atualizar dados',
+    clickToFilter: 'Clique para filtrar os demais indicadores', clickFilter: 'Filtro por clique', clearClickFilters: 'Limpar seleção', withBase: 'Com base informada', withDriver: 'Com motorista informado',
     lastDay: 'Último dia', sevenDays: '7 dias', thirtyDays: '30 dias', allPeriod: 'Todo período', startDate: 'Data inicial', endDate: 'Data final', regional: 'Regional', supervisor: 'Supervisor', stationType: 'Tipo de estação', stationBase: 'Estação / Base', service: 'Atendimento', all: 'Todos',
     pnrPeriod: 'PNR NO PERÍODO', totalTickets: 'Total de tickets no recorte', ownBase: 'BASE PRÓPRIA', ownShort: 'Própria', franchise: 'Franquia', ofTotal: 'do total', basesInvolved: 'BASES ENVOLVIDAS', stationsWithPnr: 'Estações com PNR no período', drivers: 'MOTORISTAS', distinctDrivers: 'Motoristas distintos',
     management: 'GESTÃO', rmRanking: 'Ranking por RM', distribution: 'DISTRIBUIÇÃO', ownVsFranchise: 'Base própria x franquia', share: 'Participação', bases: 'Bases', topBase: 'Top base',
@@ -38,6 +40,7 @@ const I18N = {
     operationalControl: '运营管控', pnrIndicatorPrefix: 'PNR 指标', subtitle: '按周期汇总查看异常、网点及主要责任对象。',
     autoUpdateActive: '自动更新已开启', reconnecting: '正在重新连接自动更新', lastUpdate: '最后更新', source: '数据来源',
     dashboardTab: '仪表盘', editorTab: '编辑表格', filters: '筛选', globalCut: '全局筛选', clearFilters: '清除筛选', exportXlsx: '导出表格 XLSX', updateData: '更新数据',
+    clickToFilter: '点击后联动筛选其他指标', clickFilter: '点击筛选', clearClickFilters: '清除选择', withBase: '已填写网点', withDriver: '已填写司机',
     lastDay: '最近一天', sevenDays: '7 天', thirtyDays: '30 天', allPeriod: '全部周期', startDate: '开始日期', endDate: '结束日期', regional: '区域', supervisor: '主管', stationType: '网点类型', stationBase: '网点 / 基地', service: '处理类型', all: '全部',
     pnrPeriod: '周期内 PNR', totalTickets: '当前筛选范围内的工单总数', ownBase: '直营网点', ownShort: '直营网点', franchise: '加盟网点', ofTotal: '占总量', basesInvolved: '涉及网点', stationsWithPnr: '周期内出现 PNR 的网点', drivers: '司机', distinctDrivers: '不同司机数量',
     management: '管理', rmRanking: 'RM 排名', distribution: '分布', ownVsFranchise: '直营网点 vs 加盟网点', share: '占比', bases: '网点数', topBase: '主要网点',
@@ -79,6 +82,7 @@ function applyTranslations() {
   document.documentElement.lang = state.lang;
   document.querySelectorAll('[data-i18n]').forEach(el => { el.textContent = t(el.dataset.i18n); });
   document.querySelectorAll('[data-i18n-placeholder]').forEach(el => { el.placeholder = t(el.dataset.i18nPlaceholder); });
+  document.querySelectorAll('[data-i18n-title]').forEach(el => { el.title = t(el.dataset.i18nTitle); });
   const toggle = $('langToggle');
   toggle.setAttribute('aria-label', t('languageAria'));
   toggle.querySelector('.lang-current').textContent = state.lang === 'pt-BR' ? 'PT-BR' : '简体中文';
@@ -93,6 +97,7 @@ function refreshDynamicTexts() {
       [...select.options].forEach(opt => { opt.textContent = opt.value === '__all__' ? t('all') : translateKnownValue(opt.value); });
     });
   }
+  renderClickFilterBar();
   loadMeta().catch(() => {});
   if (state.initialized) loadDashboard().catch(() => {});
   if (state.activeView === 'editor' && state.editor.loaded && !dirtyRows().length) loadEditorRows({ preserveDirty: false }).catch(() => {});
@@ -175,37 +180,99 @@ async function loadFilters({ preserve = false } = {}) {
 function queryString() {
   const params = new URLSearchParams();
   const mapping = { start_date: $('startDate').value, end_date: $('endDate').value, regional: $('regionalFilter').value, supervisor: $('supervisorFilter').value, rm: $('rmFilter').value, station: $('stationFilter').value, base: $('baseFilter').value, atendimento: $('atendimentoFilter').value };
-  Object.entries(mapping).forEach(([key, value]) => { if (value) params.set(key, value); }); return params.toString();
+  Object.entries(mapping).forEach(([key, value]) => { if (value) params.set(key, value); });
+  if (state.clickFilters.driver) params.set('driver', state.clickFilters.driver);
+  if (state.clickFilters.order_source) params.set('order_source', state.clickFilters.order_source);
+  if (state.clickFilters.has_base) params.set('has_base', '1');
+  if (state.clickFilters.has_driver) params.set('has_driver', '1');
+  return params.toString();
+}
+
+function renderClickFilterBar() {
+  const chips = [];
+  if (state.clickFilters.driver) chips.push(`${t('drivers')}: ${state.clickFilters.driver}`);
+  if (state.clickFilters.order_source) chips.push(`${t('orderOrigin')}: ${state.clickFilters.order_source}`);
+  if (state.clickFilters.has_base) chips.push(t('withBase'));
+  if (state.clickFilters.has_driver) chips.push(t('withDriver'));
+  const root = $('clickFilterBar');
+  const chipsRoot = $('clickFilterChips');
+  root.hidden = chips.length === 0;
+  chipsRoot.innerHTML = chips.map(value => `<span class="click-filter-chip" title="${escapeHtml(value)}">${escapeHtml(value)}</span>`).join('');
+
+  document.querySelectorAll('[data-kpi-filter]').forEach(card => {
+    const key = card.dataset.kpiFilter;
+    const active = (key === 'own' && $('stationFilter').value === 'Própria')
+      || (key === 'franchise' && $('stationFilter').value === 'Franquia')
+      || (key === 'bases' && state.clickFilters.has_base)
+      || (key === 'drivers' && state.clickFilters.has_driver);
+    card.classList.toggle('cross-active', active);
+    card.setAttribute('aria-pressed', active ? 'true' : 'false');
+  });
 }
 
 function renderKpis(k) {
   $('kpiTotal').textContent = formatNum(k.total); $('kpiOwn').textContent = formatNum(k.own); $('kpiFranchise').textContent = formatNum(k.franchise); $('kpiBases').textContent = formatNum(k.bases); $('kpiDrivers').textContent = formatNum(k.drivers);
   $('kpiOwnPct').textContent = pct(k.total ? k.own / k.total * 100 : 0); $('kpiFranchisePct').textContent = pct(k.total ? k.franchise / k.total * 100 : 0);
+  renderClickFilterBar();
 }
 
 function escapeHtml(value) { return String(value ?? '').replace(/[&<>'"]/g, ch => ({'&':'&amp;','<':'&lt;','>':'&gt;',"'":'&#39;','"':'&quot;'}[ch])); }
 
+function makeCrossClickable(el, handler, selected = false) {
+  el.classList.add('cross-row');
+  el.classList.toggle('cross-selected', selected);
+  el.tabIndex = 0;
+  el.setAttribute('role', 'button');
+  el.title = t('clickToFilter');
+  el.addEventListener('click', handler);
+  el.addEventListener('keydown', e => {
+    if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); handler(); }
+  });
+}
+
 function renderRm(rows) {
   $('rmCountBadge').textContent = t('rms', { n: formatNum(rows.length) }); const body = $('rmTableBody'); body.innerHTML = '';
   if (!rows.length) { body.innerHTML = `<tr><td colspan="6" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`; return; }
-  rows.forEach((r, i) => { const tr = document.createElement('tr'); tr.innerHTML = `<td><span class="rank-number ${i < 3 ? 'top' : ''}">${i+1}</span></td><td title="${escapeHtml(r.rm)}">${escapeHtml(r.rm)}</td><td class="num"><strong>${formatNum(r.count)}</strong></td><td class="num">${formatNum(r.own)}</td><td class="num">${formatNum(r.franchise)}</td><td class="num"><span class="share-cell"><span class="mini-track"><i style="width:${Math.min(100,r.share)}%"></i></span>${pct(r.share)}</span></td>`; body.appendChild(tr); });
+  rows.forEach((r, i) => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="rank-number ${i < 3 ? 'top' : ''}">${i+1}</span></td><td title="${escapeHtml(r.rm)}">${escapeHtml(r.rm)}</td><td class="num"><strong>${formatNum(r.count)}</strong></td><td class="num">${formatNum(r.own)}</td><td class="num">${formatNum(r.franchise)}</td><td class="num"><span class="share-cell"><span class="mini-track"><i style="width:${Math.min(100,r.share)}%"></i></span>${pct(r.share)}</span></td>`;
+    makeCrossClickable(tr, () => applySelectCrossFilter('rmFilter', r.rm), $('rmFilter').value === r.rm);
+    body.appendChild(tr);
+  });
 }
 
 function renderStations(rows) {
   const body = $('stationTableBody'); body.innerHTML = '';
-  rows.forEach(r => { const tr = document.createElement('tr'); tr.innerHTML = `<td><span class="station-type-cell"><i class="station-dot ${r.station === 'Franquia' ? 'muted' : ''}"></i>${escapeHtml(translateKnownValue(r.station))}</span></td><td class="num"><strong>${formatNum(r.count)}</strong></td><td class="num">${pct(r.share)}</td><td class="num">${formatNum(r.bases)}</td><td title="${escapeHtml(r.top_base)}">${escapeHtml(r.top_base)}</td>`; body.appendChild(tr); });
+  rows.forEach(r => {
+    const tr = document.createElement('tr');
+    tr.innerHTML = `<td><span class="station-type-cell"><i class="station-dot ${r.station === 'Franquia' ? 'muted' : ''}"></i>${escapeHtml(translateKnownValue(r.station))}</span></td><td class="num"><strong>${formatNum(r.count)}</strong></td><td class="num">${pct(r.share)}</td><td class="num">${formatNum(r.bases)}</td><td title="${escapeHtml(r.top_base)}">${escapeHtml(r.top_base)}</td>`;
+    makeCrossClickable(tr, () => applySelectCrossFilter('stationFilter', r.station), $('stationFilter').value === r.station);
+    body.appendChild(tr);
+  });
 }
 
-function renderRanking(id, rows) {
+function renderRanking(id, rows, dimension) {
   const root = $(id); root.innerHTML = ''; if (!rows.length) { root.innerHTML = `<div class="empty-state">${escapeHtml(t('noDataPeriod'))}</div>`; return; }
   const max = Math.max(...rows.map(r => r.count), 1);
-  rows.forEach((r,i) => { const row = document.createElement('div'); row.className = 'rank-row'; row.innerHTML = `<div class="rank-pos">${String(i+1).padStart(2,'0')}</div><div class="rank-label-wrap"><div class="rank-label" title="${escapeHtml(r.label)}">${escapeHtml(r.label)}</div><div class="rank-track"><i style="width:${Math.max(2,r.count/max*100)}%"></i></div></div><div class="rank-count">${formatNum(r.count)}</div>`; root.appendChild(row); });
+  rows.forEach((r,i) => {
+    const row = document.createElement('div'); row.className = 'rank-row';
+    row.innerHTML = `<div class="rank-pos">${String(i+1).padStart(2,'0')}</div><div class="rank-label-wrap"><div class="rank-label" title="${escapeHtml(r.label)}">${escapeHtml(r.label)}</div><div class="rank-track"><i style="width:${Math.max(2,r.count/max*100)}%"></i></div></div><div class="rank-count">${formatNum(r.count)}</div>`;
+    const selected = dimension === 'base' ? $('baseFilter').value === r.label : state.clickFilters[dimension] === r.label;
+    const handler = dimension === 'base' ? () => applySelectCrossFilter('baseFilter', r.label) : () => applyExtraCrossFilter(dimension, r.label);
+    makeCrossClickable(row, handler, selected);
+    root.appendChild(row);
+  });
 }
 
 function renderDaily(rows) {
   const root = $('dailyChart'); root.innerHTML = ''; if (!rows.length) { root.innerHTML = `<div class="empty-state">${escapeHtml(t('noDaily'))}</div>`; return; }
   const max = Math.max(...rows.map(r => r.count), 1);
-  rows.forEach(r => { const height = Math.max(3, r.count / max * 100); const col = document.createElement('div'); col.className = 'spark-col'; const d = new Date(`${r.date}T12:00:00`); const label = d.toLocaleDateString(locale(), { day:'2-digit', month:'2-digit' }); col.innerHTML = `<div class="spark-tip">${label} · ${formatNum(r.count)} PNR</div><div class="spark-bar" style="height:${height}%"></div><div class="spark-date">${label}</div>`; root.appendChild(col); });
+  rows.forEach(r => {
+    const height = Math.max(3, r.count / max * 100); const col = document.createElement('div'); col.className = 'spark-col'; const d = new Date(`${r.date}T12:00:00`); const label = d.toLocaleDateString(locale(), { day:'2-digit', month:'2-digit' });
+    col.innerHTML = `<div class="spark-tip">${label} · ${formatNum(r.count)} PNR</div><div class="spark-bar" style="height:${height}%"></div><div class="spark-date">${label}</div>`;
+    makeCrossClickable(col, () => applyDateCrossFilter(r.date), $('startDate').value === r.date && $('endDate').value === r.date);
+    root.appendChild(col);
+  });
 }
 
 async function loadMeta() {
@@ -216,15 +283,62 @@ async function loadMeta() {
 async function loadDashboard() {
   if (state.dashboardLoading) return; state.dashboardLoading = true;
   try {
-    const data = await api(`/api/dashboard?${queryString()}`); renderKpis(data.kpis); renderRm(data.rm_ranking || []); renderStations(data.station_summary || []); renderRanking('topBases', data.top_bases || []); renderRanking('topDrivers', data.top_drivers || []); renderRanking('topOrigins', data.top_origins || []); renderDaily(data.daily || []);
+    const data = await api(`/api/dashboard?${queryString()}`); renderKpis(data.kpis); renderRm(data.rm_ranking || []); renderStations(data.station_summary || []); renderRanking('topBases', data.top_bases || [], 'base'); renderRanking('topDrivers', data.top_drivers || [], 'driver'); renderRanking('topOrigins', data.top_origins || [], 'order_source'); renderDaily(data.daily || []);
     const start = $('startDate').value, end = $('endDate').value; $('periodBadge').textContent = start && end ? `${start.split('-').reverse().join('/')} → ${end.split('-').reverse().join('/')}` : '—';
   } finally { state.dashboardLoading = false; }
 }
 
 let filterTimer = null;
 function scheduleFilterReload() { clearTimeout(filterTimer); markChip(''); filterTimer = setTimeout(() => loadDashboard().catch(err => toast(err.message,'error')), 180); }
+
+async function applySelectCrossFilter(selectId, value) {
+  const select = $(selectId);
+  if (!select) return;
+  select.value = select.value === value ? '__all__' : value;
+  markChip('');
+  await loadDashboard();
+}
+
+async function applyExtraCrossFilter(key, value) {
+  state.clickFilters[key] = state.clickFilters[key] === value ? '' : value;
+  markChip('');
+  await loadDashboard();
+}
+
+async function applyDateCrossFilter(value) {
+  $('startDate').value = value;
+  $('endDate').value = value;
+  markChip('');
+  await loadDashboard();
+}
+
+async function applyKpiCrossFilter(kind) {
+  if (kind === 'total') {
+    state.clickFilters = { driver: '', order_source: '', has_base: false, has_driver: false };
+    ['rmFilter','stationFilter','baseFilter'].forEach(id => { if ($(id)) $(id).value = '__all__'; });
+  } else if (kind === 'own') {
+    $('stationFilter').value = $('stationFilter').value === 'Própria' ? '__all__' : 'Própria';
+  } else if (kind === 'franchise') {
+    $('stationFilter').value = $('stationFilter').value === 'Franquia' ? '__all__' : 'Franquia';
+  } else if (kind === 'bases') {
+    state.clickFilters.has_base = !state.clickFilters.has_base;
+  } else if (kind === 'drivers') {
+    state.clickFilters.has_driver = !state.clickFilters.has_driver;
+  }
+  markChip('');
+  await loadDashboard();
+}
+
+async function clearClickFilters() {
+  state.clickFilters = { driver: '', order_source: '', has_base: false, has_driver: false };
+  renderClickFilterBar();
+  await loadDashboard();
+}
+
 async function resetFilters() {
-  ['regionalFilter','supervisorFilter','rmFilter','stationFilter','baseFilter','atendimentoFilter'].forEach(id => $(id).value='__all__'); rangeDates('day'); markChip('day'); await loadDashboard();
+  ['regionalFilter','supervisorFilter','rmFilter','stationFilter','baseFilter','atendimentoFilter'].forEach(id => $(id).value='__all__');
+  state.clickFilters = { driver: '', order_source: '', has_base: false, has_driver: false };
+  rangeDates('day'); markChip('day'); await loadDashboard();
 }
 
 function openModal() { $('uploadModal').classList.add('open'); $('uploadModal').setAttribute('aria-hidden','false'); }
@@ -294,6 +408,12 @@ function toggleLanguage(){state.lang=state.lang==='pt-BR'?'zh-CN':'pt-BR';localS
 function bindEvents(){
   ['startDate','endDate','regionalFilter','supervisorFilter','rmFilter','stationFilter','baseFilter','atendimentoFilter'].forEach(id=>$(id).addEventListener('change',scheduleFilterReload));
   document.querySelectorAll('.chip').forEach(btn=>btn.addEventListener('click',async()=>{rangeDates(btn.dataset.range);markChip(btn.dataset.range);await loadDashboard();}));
+  document.querySelectorAll('[data-kpi-filter]').forEach(card => {
+    const run = () => applyKpiCrossFilter(card.dataset.kpiFilter).catch(err => toast(err.message,'error'));
+    card.addEventListener('click', run);
+    card.addEventListener('keydown', e => { if (e.key === 'Enter' || e.key === ' ') { e.preventDefault(); run(); } });
+  });
+  $('clearClickFiltersBtn').addEventListener('click',()=>clearClickFilters().catch(err=>toast(err.message,'error')));
   $('resetBtn').addEventListener('click',resetFilters);$('exportBtn').addEventListener('click',exportTables);$('uploadBtn').addEventListener('click',openModal);$('langToggle').addEventListener('click',toggleLanguage);$('modalClose').addEventListener('click',closeModal);$('uploadModal').addEventListener('click',e=>{if(e.target===$('uploadModal'))closeModal();});
   $('fileInput').addEventListener('change',()=>{const file=$('fileInput').files[0];if(file)$('dropTitle').textContent=file.name;});const drop=$('dropZone');['dragenter','dragover'].forEach(evt=>drop.addEventListener(evt,e=>{e.preventDefault();drop.classList.add('drag');}));['dragleave','drop'].forEach(evt=>drop.addEventListener(evt,e=>{e.preventDefault();drop.classList.remove('drag');}));drop.addEventListener('drop',e=>setSelectedFile(e.dataTransfer.files[0]));$('sendUpload').addEventListener('click',sendUpload);
   document.querySelectorAll('.view-tab').forEach(btn=>btn.addEventListener('click',()=>switchView(btn.dataset.view)));$('editorApplyBtn').addEventListener('click',async()=>{state.editor.page=1;await loadEditorRows();});$('editorClearBtn').addEventListener('click',clearEditorFilters);$('editorRefreshBtn').addEventListener('click',()=>loadEditorRows());$('editorAddBtn').addEventListener('click',addEditorRow);$('editorSaveBtn').addEventListener('click',saveEditorRows);$('editorPrevBtn').addEventListener('click',async()=>{if(state.editor.page>1){state.editor.page-=1;await loadEditorRows();}});$('editorNextBtn').addEventListener('click',async()=>{if(state.editor.page<state.editor.pages){state.editor.page+=1;await loadEditorRows();}});$('editorPageSize').addEventListener('change',async()=>{state.editor.page=1;await loadEditorRows();});$('editorSearch').addEventListener('keydown',async e=>{if(e.key==='Enter'){e.preventDefault();state.editor.page=1;await loadEditorRows();}});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});
