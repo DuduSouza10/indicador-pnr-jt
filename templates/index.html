@@ -17,7 +17,7 @@
         <div class="status-row">
           <span id="liveBadge" class="status-pill live"><i></i><span data-i18n="autoUpdateActive">Atualização automática ativa</span></span>
           <span id="lastUpdate" class="status-pill">Última atualização: —</span>
-          <span id="sourceBadge" class="status-pill">Fonte: —</span>
+          <span id="sourceBadge" class="status-pill">Fontes: —</span>
         </div>
       </div>
 
@@ -34,6 +34,7 @@
 
     <nav class="view-tabs" aria-label="Navegação principal">
       <button class="view-tab active" data-view="dashboard" type="button" data-i18n="dashboardTab">Dashboard</button>
+      <button class="view-tab" data-view="charts" type="button" data-i18n="chartsTab">Gráficos</button>
       <button class="view-tab" data-view="editor" type="button" data-i18n="editorTab">Editar planilha</button>
     </nav>
 
@@ -43,7 +44,7 @@
           <div><span class="section-kicker" data-i18n="filters">FILTROS</span><h2 data-i18n="globalCut">Recorte global</h2></div>
           <div class="toolbar-actions">
             <button class="ghost-btn" id="resetBtn" type="button" data-i18n="clearFilters">Limpar filtros</button>
-            <button class="ghost-btn" id="exportBtn" type="button"><span class="btn-icon">⇩</span><span data-i18n="exportXlsx">Exportar tabelas XLSX</span></button>
+            <button class="ghost-btn" id="exportBtn" type="button"><span class="btn-icon">⇩</span><span data-i18n="exportXlsx">Exportar XLSX</span></button>
             <button class="primary-btn" id="uploadBtn" type="button"><span class="btn-icon">↑</span><span data-i18n="updateData">Atualizar dados</span></button>
           </div>
         </div>
@@ -68,7 +69,7 @@
       </section>
 
       <section class="kpi-grid" id="kpiGrid">
-        <article class="kpi-card primary-kpi cross-clickable" data-kpi-filter="total" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="pnrPeriod">PNR NO PERÍODO</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-foot" data-i18n="totalTickets">Total de tickets no recorte</div></article>
+        <article class="kpi-card primary-kpi cross-clickable" data-kpi-filter="total" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="pnrPeriod">PNR NO PERÍODO</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-foot" data-i18n="totalTickets">Total de reclamações no recorte</div></article>
         <article class="kpi-card cross-clickable" data-kpi-filter="own" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="ownBase">BASE PRÓPRIA</div><div class="kpi-value" id="kpiOwn">—</div><div class="kpi-foot"><span id="kpiOwnPct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
         <article class="kpi-card cross-clickable" data-kpi-filter="franchise" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="franchise">FRANQUIA</div><div class="kpi-value" id="kpiFranchise">—</div><div class="kpi-foot"><span id="kpiFranchisePct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
         <article class="kpi-card cross-clickable" data-kpi-filter="bases" role="button" tabindex="0" data-i18n-title="clickToFilter"><div class="kpi-label" data-i18n="basesInvolved">BASES ENVOLVIDAS</div><div class="kpi-value" id="kpiBases">—</div><div class="kpi-foot" data-i18n="stationsWithPnr">Estações com PNR no período</div></article>
@@ -80,10 +81,15 @@
         <button class="ghost-btn compact-btn" id="clearClickFiltersBtn" type="button" data-i18n="clearClickFilters">Limpar seleção</button>
       </div>
 
-      <section class="grid-2">
-        <article class="panel data-panel">
-          <div class="panel-head"><div><span class="section-kicker" data-i18n="management">GESTÃO</span><h2 data-i18n="rmRanking">Ranking por RM</h2></div><span class="context-pill" id="rmCountBadge">0 RMs</span></div>
-          <div class="table-scroll"><table class="data-table"><thead><tr><th>#</th><th>RM</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="share">Participação</th></tr></thead><tbody id="rmTableBody"></tbody></table></div>
+      <section class="grid-2 ranking-grid">
+        <article class="panel data-panel rm-ranking-panel">
+          <div class="panel-head">
+            <div><span class="section-kicker" data-i18n="management">GESTÃO</span><h2 data-i18n="rmRanking">Ranking por RM</h2></div>
+            <div class="ranking-context"><span class="context-pill" id="rmCountBadge">0 RMs</span><span class="context-pill rate-date" id="rateDateBadge">—</span></div>
+          </div>
+          <div class="table-scroll"><table class="data-table rm-rate-table"><thead><tr>
+            <th>#</th><th>RM</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
+          </tr></thead><tbody id="rmTableBody"></tbody></table></div>
         </article>
 
         <article class="panel data-panel">
@@ -109,13 +115,46 @@
       </section>
     </div>
 
+    <div id="chartsView" class="app-view">
+      <section class="panel charts-filter-panel">
+        <div class="toolbar-title">
+          <div><span class="section-kicker" data-i18n="chartsAnalysis">ANÁLISE GRÁFICA</span><h2 data-i18n="pnrRateEvolution">Evolução da Taxa de PNR</h2></div>
+          <button class="ghost-btn" id="chartResetBtn" type="button" data-i18n="clearFilters">Limpar filtros</button>
+        </div>
+        <div class="chart-filters-grid">
+          <label class="field"><span data-i18n="startDate">Data inicial</span><input id="chartStartDate" type="date"></label>
+          <label class="field"><span data-i18n="endDate">Data final</span><input id="chartEndDate" type="date"></label>
+          <label class="field"><span data-i18n="regional">Regional</span><select id="chartRegionalFilter"></select></label>
+          <div class="field rm-selector-field"><span data-i18n="rmsFilter">RM's</span><div id="chartRmChips" class="rm-chip-list"></div></div>
+        </div>
+      </section>
+
+      <section class="chart-kpi-grid">
+        <article class="kpi-card"><div class="kpi-label" data-i18n="totalComplaints">RECLAMAÇÕES</div><div class="kpi-value" id="chartKpiComplaints">—</div><div class="kpi-foot" data-i18n="selectedPeriod">No período selecionado</div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="merchandiseValue">VALOR DA MERCADORIA</div><div class="kpi-value currency-value" id="chartKpiValue">—</div><div class="kpi-foot" data-i18n="sumMerchandise">Soma das mercadorias reclamadas</div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="franchise">FRANQUIA</div><div class="kpi-value" id="chartKpiFranchise">—</div><div class="kpi-foot" data-i18n="franchiseComplaints">Reclamações em franquias</div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="ownBase">BASE PRÓPRIA</div><div class="kpi-value" id="chartKpiOwn">—</div><div class="kpi-foot" data-i18n="ownComplaints">Reclamações em bases próprias</div></article>
+      </section>
+
+      <section class="panel line-chart-panel">
+        <div class="panel-head chart-panel-head">
+          <div><span class="section-kicker" data-i18n="sparklineModel">MODELO SPARKLINE</span><h2 data-i18n="dailyRateByRm">Taxa diária de PNR por RM</h2></div>
+          <span class="context-pill" data-i18n="rateFormula">Reclamações ÷ Entregas × 10.000</span>
+        </div>
+        <div class="line-chart-layout">
+          <aside id="chartLegend" class="chart-legend"></aside>
+          <div id="rmLineChartWrap" class="rm-line-chart-wrap"><div id="rmLineChart" class="rm-line-chart"></div></div>
+        </div>
+      </section>
+    </div>
+
     <div id="editorView" class="app-view">
       <section class="panel editor-panel">
         <div class="editor-head">
           <div>
             <span class="section-kicker" data-i18n="baseEditing">EDIÇÃO DA BASE</span>
-            <h2 data-i18n="pnrSpreadsheet">Planilha do PNR</h2>
-            <p data-i18n="editorDescription">Altere os registros diretamente aqui. Ao salvar, os indicadores são recalculados e a mudança aparece para todos os usuários conectados.</p>
+            <h2 data-i18n="pnrSpreadsheet">Planilha PNR BI</h2>
+            <p data-i18n="editorDescription">Altere os registros do PNR BI diretamente aqui. Ao salvar, os indicadores são recalculados e a mudança aparece para todos os usuários conectados.</p>
           </div>
           <div class="editor-head-actions">
             <button class="ghost-btn" id="editorRefreshBtn" type="button" data-i18n="refreshList">Atualizar lista</button>
@@ -139,16 +178,13 @@
           <div class="editor-filter-actions"><button class="ghost-btn" id="editorClearBtn" type="button" data-i18n="clear">Limpar</button><button class="primary-btn" id="editorApplyBtn" type="button" data-i18n="applyFilters">Aplicar filtros</button></div>
         </div>
 
-        <div class="editor-info-row">
-          <span id="editorResultCount">— registros</span>
-          <span id="editorUnsavedHint" data-i18n="unsavedHint">As células alteradas ficam destacadas até serem salvas.</span>
-        </div>
+        <div class="editor-info-row"><span id="editorResultCount">— registros</span><span id="editorUnsavedHint" data-i18n="unsavedHint">As células alteradas ficam destacadas até serem salvas.</span></div>
 
         <div class="editor-table-wrap">
           <table class="editor-table">
             <thead><tr>
               <th class="sticky-col id-col">ID</th>
-              <th data-i18n="date">Data</th><th data-i18n="regional">Regional</th><th data-i18n="ticket">Ticket</th><th data-i18n="orderOrigin">Origem do pedido</th><th data-i18n="base">Base</th><th data-i18n="driver">Motorista</th><th>RM</th><th data-i18n="supervisor">Supervisor</th><th data-i18n="stationType">Tipo estação</th><th data-i18n="service">Atendimento</th><th data-i18n="reasonN1">Motivo N1</th><th data-i18n="reasonN2">Motivo N2</th><th class="action-col" data-i18n="action">Ação</th>
+              <th data-i18n="date">Data</th><th data-i18n="regional">Regional</th><th data-i18n="ticket">Ticket</th><th data-i18n="orderOrigin">Origem do pedido</th><th data-i18n="base">Base</th><th data-i18n="driver">Motorista</th><th>RM</th><th data-i18n="supervisor">Supervisor</th><th data-i18n="stationType">Tipo estação</th><th data-i18n="service">Atendimento</th><th data-i18n="reasonN1">Motivo N1</th><th data-i18n="reasonN2">Motivo N2</th><th data-i18n="merchandiseValue">Valor da mercadoria</th><th class="action-col" data-i18n="action">Ação</th>
             </tr></thead>
             <tbody id="editorTableBody"></tbody>
           </table>
@@ -166,20 +202,30 @@
   </main>
 
   <div class="modal-backdrop" id="uploadModal" aria-hidden="true">
-    <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
+    <div class="modal-card dual-upload-modal" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button class="modal-close" id="modalClose" type="button" aria-label="Fechar">×</button>
       <div class="modal-icon">↥</div>
       <span class="section-kicker" data-i18n="sharedUpdate">ATUALIZAÇÃO COMPARTILHADA</span>
-      <h2 id="modalTitle" data-i18n="updatePnrBase">Atualizar base do PNR</h2>
-      <p data-i18n="uploadDescription">Envie a nova planilha .xlsx. A base atual será substituída e todos os usuários conectados receberão a atualização automaticamente.</p>
-      <label class="drop-zone" id="dropZone">
-        <input id="fileInput" type="file" accept=".xlsx" hidden>
-        <span class="drop-title" id="dropTitle" data-i18n="dropTitle">Clique ou arraste a planilha aqui</span>
-        <span class="drop-help" data-i18n="dropHelp">Limite: 40 MB · os mesmos cabeçalhos da planilha atual</span>
-      </label>
+      <h2 id="modalTitle" data-i18n="updateBothBases">Atualizar PNR BI + Entregas BI</h2>
+      <p data-i18n="dualUploadDescription">As duas planilhas são obrigatórias. A atualização só será publicada quando PNR BI e Entregas BI forem enviadas juntas e validadas.</p>
+      <div class="dual-upload-grid">
+        <label class="drop-zone" id="pnrDropZone">
+          <input id="pnrFileInput" type="file" accept=".xlsx" hidden>
+          <strong data-i18n="pnrBi">PNR BI</strong>
+          <span class="drop-title" id="pnrDropTitle" data-i18n="selectPnrBi">Selecionar planilha PNR BI</span>
+          <span class="drop-help" data-i18n="pnrHelp">Base de reclamações e valor de mercadoria</span>
+        </label>
+        <label class="drop-zone" id="deliveryDropZone">
+          <input id="deliveryFileInput" type="file" accept=".xlsx" hidden>
+          <strong data-i18n="deliveryBi">Entregas BI</strong>
+          <span class="drop-title" id="deliveryDropTitle" data-i18n="selectDeliveryBi">Selecionar planilha Entregas BI</span>
+          <span class="drop-help" data-i18n="deliveryHelp">Volume de entregas por data e RM</span>
+        </label>
+      </div>
+      <div class="dual-required-note" data-i18n="bothRequired">Obrigatório: envie os dois arquivos na mesma atualização.</div>
       <label class="field admin-key-field"><span data-i18n="updatePassword">Senha para atualizar os dados</span><input id="adminKey" type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Digite a senha"></label>
       <div class="upload-progress-wrap" id="uploadProgressWrap"><div class="upload-progress"><span id="uploadProgressBar"></span></div><small id="uploadStatus" data-i18n="preparing">Preparando...</small></div>
-      <button class="primary-btn full" id="sendUpload" type="button" data-i18n="importPublish">Importar e publicar atualização</button>
+      <button class="primary-btn full" id="sendUpload" type="button" data-i18n="importPublishBoth">Importar as duas e publicar</button>
     </div>
   </div>
 

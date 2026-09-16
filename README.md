@@ -1,127 +1,52 @@
 # Indicador de PNR — J&T Express
 
-Dashboard web em **tema claro**, preparado para rodar localmente ou no Railway com PostgreSQL compartilhado.
+Dashboard Flask pronto para Railway, com PostgreSQL compartilhado, atualização multiusuário, edição do PNR BI, exportação XLSX completa e tradução PT-BR / Chinês Simplificado.
 
-## O que está implementado
+## Atualização obrigatória com 2 planilhas
 
-- Filtro global exibido como **Data inicial / Data final** em todo o site.
-- Na importação, esse filtro usa prioritariamente a coluna **Hora de Envio** da planilha. A coluna `Data` fica apenas como fallback para compatibilidade com a base seed antiga.
-- Filtros de **Regional, Supervisor, RM, Tipo de Estação, Estação/Base e Atendimento**.
-- Atalhos de período: **Último dia, 7 dias, 30 dias e Todo período**.
-- Ranking por RM com PNR total, Base Própria, Franquia e participação.
-- Tabela específica **Base Própria x Franquia**.
-- **Top 10 Bases** mais ofensoras.
-- **Top 10 Motoristas** ofensores.
-- **Top 10 Origens do Pedido**.
-- Evolução diária do PNR.
-- **Cross-filter por clique**: cartões de Base Própria/Franquia, ranking por RM, Top 10 de bases, motoristas, origens e barras diárias podem ser clicados para filtrar os demais indicadores; clicar novamente no mesmo item remove o recorte quando aplicável.
-- Botão **Exportar tabelas XLSX**, respeitando os filtros ativos.
-- Upload de nova planilha diretamente no dashboard.
-- Aba separada **Editar planilha**, com edição inline, inclusão e exclusão de linhas, filtros próprios, busca e paginação.
-- Alterações salvas recalculam os indicadores e incrementam a versão compartilhada do banco.
-- **Senha obrigatória para qualquer alteração persistida:** `3264542`.
-- **PT-BR ⇄ Chinês Simplificado** por botão no topo, incluindo textos, filtros, mensagens e editor.
-- **Sincronização automática entre usuários**: o navegador consulta a versão do banco a cada 3 segundos e atualiza os indicadores quando outra pessoa altera os dados.
-- Banco local SQLite para testes e **PostgreSQL no Railway** para produção.
-- Logo J&T Express + Maomao no canto superior direito.
+O botão **Atualizar dados** exige os dois arquivos na mesma operação:
 
-## Rodar localmente no Windows
+1. **PNR BI** — reclamações, RM, tipo de estação e valor da mercadoria.
+2. **Entregas BI** — volume entregue por data/RM.
 
-1. Extraia a pasta.
-2. Dê duplo clique em `INICIAR_LOCAL.bat`.
-3. Acesse `http://127.0.0.1:5000`.
+A atualização é transacional: se um dos arquivos faltar ou falhar na validação, nenhum dos dois bancos é substituído.
 
-Na primeira execução, o sistema importa `data/pnr_seed.xlsx` para o banco local.
+Senha de alteração configurada no projeto: `3264542`.
 
-## Publicar no Railway
+## Taxa de PNR
 
-### 1. Envie o projeto
+Por RM e por dia:
 
-Suba os arquivos para um repositório GitHub e crie um serviço no Railway a partir dele.
+`Taxa PNR = Reclamações do dia / Quantidade entregue com assinatura do dia × 10.000`
 
-### 2. Adicione PostgreSQL
+- Reclamações: contagem de linhas do PNR BI agrupadas por RM.
+- Entregas: coluna **Quantidade entregue com assinatura** da Entregas BI, agrupada por RM.
+- O pareamento de RM ignora diferenças de maiúsculas/minúsculas e acentuação.
+- O ranking exibe também Valor da Mercadoria, Taxa PNR do dia de referência e variação contra D-1.
 
-No mesmo projeto Railway:
+## Página Gráficos
 
-1. Clique em **+ New**.
-2. Selecione **Database > PostgreSQL**.
-3. Volte ao serviço do dashboard e abra **Variables**.
-4. Crie:
+A aba **Gráficos** contém filtros independentes de data, Regional e RM, cards consolidados e gráfico de linhas por RM com Taxa PNR e quantidade de reclamações em cada ponto.
+
+## Exportação XLSX
+
+A exportação inclui os resumos do dashboard e também a(s) aba(s) **PNR BI** com todas as colunas e todos os valores do recorte filtrado. Bases maiores que 100.000 linhas são divididas em várias abas.
+
+## Railway
+
+Adicione um PostgreSQL ao mesmo projeto e, no serviço do dashboard, configure:
 
 ```text
 DATABASE_URL=${{Postgres.DATABASE_URL}}
 ```
 
-Se o serviço de banco tiver outro nome, substitua `Postgres` pelo nome mostrado no Railway.
+O projeto já contém `railway.json`, `Procfile` e `requirements.txt`.
 
-### 3. Gere o domínio
+## Local
 
-No serviço web, use **Settings > Networking > Generate Domain**.
+No Windows, execute `INICIAR_LOCAL.bat` ou:
 
-## Senha de edição
-
-A senha exigida pelo backend para:
-
-- importar uma nova planilha;
-- salvar alterações na aba de edição;
-- excluir registros;
-
-é:
-
-```text
-3264542
-```
-
-Sem a senha correta, o backend rejeita a operação e nenhuma alteração é aplicada.
-
-## Atualização simultânea
-
-A planilha enviada pelo botão **Atualizar dados** e as alterações feitas na aba **Editar planilha** usam o mesmo banco. Após uma alteração válida:
-
-1. o banco incrementa uma versão global;
-2. todos os navegadores abertos consultam essa versão a cada 3 segundos;
-3. ao detectar mudança, os filtros, rankings e indicadores são recarregados automaticamente.
-
-## Planilha esperada
-
-A importação procura principalmente:
-
-- `Hora de Envio` — fonte prioritária do filtro de data;
-- `Data` — fallback para bases antigas;
-- `Filial`;
-- `Número do ticket`;
-- `Origem do Pedido`;
-- `Base`;
-- `Motorista`;
-- `RM`;
-- `Supervisor`;
-- `Estação`;
-- `Atendimento`.
-
-Espaços extras nos cabeçalhos são normalizados automaticamente.
-
-### Base Própria x Franquia
-
-O campo `Estação` é normalizado para `Própria` ou `Franquia`. Se o campo estiver inválido ou ausente, bases iniciadas por `F ` ou `F-` são tratadas como franquia; as demais bases válidas são tratadas como próprias.
-
-## Estrutura principal
-
-```text
-indicador_pnr_railway/
-├── app.py
-├── requirements.txt
-├── railway.json
-├── Procfile
-├── .python-version
-├── INICIAR_LOCAL.bat
-├── data/
-│   └── pnr_seed.xlsx
-├── static/
-│   ├── css/app.css
-│   ├── js/app.js
-│   └── img/
-│       ├── jt-logo-white.svg
-│       └── maomao.png
-└── templates/
-    └── index.html
+```bash
+pip install -r requirements.txt
+python app.py
 ```
