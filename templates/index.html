@@ -3,98 +3,103 @@
 <head>
   <meta charset="utf-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <meta name="theme-color" content="#050505">
+  <meta name="theme-color" content="#f6f7f9">
   <title>Indicador de PNR | J&T Express</title>
   <link rel="stylesheet" href="{{ url_for('static', filename='css/app.css') }}">
 </head>
 <body>
-  <div class="ambient ambient-one"></div>
-  <div class="ambient ambient-two"></div>
-
   <main class="shell">
     <header class="topbar">
       <div class="headline-wrap">
-        <div class="eyebrow"><span class="pulse-dot"></span> CONTROLE OPERACIONAL</div>
-        <h1>Indicador de <span>PNR</span></h1>
-        <p>Visão consolidada de ocorrências, estações e ofensores por período.</p>
+        <div class="eyebrow"><span class="pulse-dot"></span><span data-i18n="operationalControl">CONTROLE OPERACIONAL</span></div>
+        <h1><span data-i18n="pnrIndicatorPrefix">Indicador de</span> <strong>PNR</strong></h1>
+        <p data-i18n="subtitle">Visão consolidada de ocorrências, estações e ofensores por período.</p>
         <div class="status-row">
-          <span id="liveBadge" class="status-pill live"><i></i> Atualização automática ativa</span>
+          <span id="liveBadge" class="status-pill live"><i></i><span data-i18n="autoUpdateActive">Atualização automática ativa</span></span>
           <span id="lastUpdate" class="status-pill">Última atualização: —</span>
           <span id="sourceBadge" class="status-pill">Fonte: —</span>
         </div>
       </div>
-      <div class="brand-corner" aria-label="J&T Express">
-        <img class="maomao" src="{{ url_for('static', filename='img/maomao.png') }}" alt="Maomao J&T Express">
-        <div class="brand-divider"></div>
-        <img class="jt-logo" src="{{ url_for('static', filename='img/jt-logo-white.svg') }}" alt="J&T Express">
+
+      <div class="top-actions">
+        <button id="langToggle" class="language-trigger" type="button" aria-label="Alternar idioma">
+          <span class="lang-current">PT-BR</span><span class="lang-separator">⇄</span><span class="lang-next">简体中文</span>
+        </button>
+        <div class="brand-corner" aria-label="J&T Express">
+          <img class="maomao" src="{{ url_for('static', filename='img/maomao.png') }}" alt="Maomao J&T Express">
+          <div class="logo-badge"><img class="jt-logo" src="{{ url_for('static', filename='img/jt-logo-white.svg') }}" alt="J&T Express"></div>
+        </div>
       </div>
     </header>
 
-    <nav class="view-tabs" aria-label="Navegação do Indicador de PNR">
-      <button class="view-tab active" type="button" data-view="dashboard">Dashboard</button>
-      <button class="view-tab" type="button" data-view="editor">Editar base</button>
+    <nav class="view-tabs" aria-label="Navegação principal">
+      <button class="view-tab active" data-view="dashboard" type="button" data-i18n="dashboardTab">Dashboard</button>
+      <button class="view-tab" data-view="editor" type="button" data-i18n="editorTab">Editar planilha</button>
     </nav>
 
     <div id="dashboardView" class="app-view active">
-      <section class="toolbar panel">
+      <section class="panel toolbar">
         <div class="toolbar-title">
-          <div>
-            <span class="section-kicker">FILTROS GERAIS</span>
-            <h2>Recorte dos dados</h2>
-          </div>
+          <div><span class="section-kicker" data-i18n="filters">FILTROS</span><h2 data-i18n="globalCut">Recorte global</h2></div>
           <div class="toolbar-actions">
-            <button class="ghost-btn" id="resetBtn" type="button">Limpar filtros</button>
-            <button class="primary-btn" id="uploadBtn" type="button"><span class="upload-icon">↑</span> Atualizar dados</button>
+            <button class="ghost-btn" id="resetBtn" type="button" data-i18n="clearFilters">Limpar filtros</button>
+            <button class="ghost-btn" id="exportBtn" type="button"><span class="btn-icon">⇩</span><span data-i18n="exportXlsx">Exportar tabelas XLSX</span></button>
+            <button class="primary-btn" id="uploadBtn" type="button"><span class="btn-icon">↑</span><span data-i18n="updateData">Atualizar dados</span></button>
           </div>
         </div>
 
         <div class="quick-dates">
-          <button class="chip active" data-range="day" type="button">Último dia</button>
-          <button class="chip" data-range="7" type="button">7 dias</button>
-          <button class="chip" data-range="30" type="button">30 dias</button>
-          <button class="chip" data-range="all" type="button">Todo período</button>
+          <button class="chip active" data-range="day" type="button" data-i18n="lastDay">Último dia</button>
+          <button class="chip" data-range="7" type="button" data-i18n="sevenDays">7 dias</button>
+          <button class="chip" data-range="30" type="button" data-i18n="thirtyDays">30 dias</button>
+          <button class="chip" data-range="all" type="button" data-i18n="allPeriod">Todo período</button>
         </div>
 
         <div class="filters-grid">
-          <label class="field date-field"><span>Data inicial</span><input id="startDate" type="date"></label>
-          <label class="field date-field"><span>Data final</span><input id="endDate" type="date"></label>
-          <label class="field"><span>Regional</span><select id="regionalFilter"></select></label>
-          <label class="field"><span>Supervisor</span><select id="supervisorFilter"></select></label>
+          <label class="field date-field"><span data-i18n="startDate">Data inicial</span><input id="startDate" type="date"></label>
+          <label class="field date-field"><span data-i18n="endDate">Data final</span><input id="endDate" type="date"></label>
+          <label class="field"><span data-i18n="regional">Regional</span><select id="regionalFilter"></select></label>
+          <label class="field"><span data-i18n="supervisor">Supervisor</span><select id="supervisorFilter"></select></label>
           <label class="field"><span>RM</span><select id="rmFilter"></select></label>
-          <label class="field"><span>Tipo de estação</span><select id="stationFilter"></select></label>
-          <label class="field wide-field"><span>Estação / Base</span><select id="baseFilter"></select></label>
-          <label class="field wide-field"><span>Atendimento</span><select id="atendimentoFilter"></select></label>
+          <label class="field"><span data-i18n="stationType">Tipo de estação</span><select id="stationFilter"></select></label>
+          <label class="field wide-field"><span data-i18n="stationBase">Estação / Base</span><select id="baseFilter"></select></label>
+          <label class="field wide-field"><span data-i18n="service">Atendimento</span><select id="atendimentoFilter"></select></label>
         </div>
       </section>
 
       <section class="kpi-grid" id="kpiGrid">
-        <article class="kpi-card primary-kpi"><div class="kpi-label">PNR NO PERÍODO</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-foot">Total de tickets no recorte</div></article>
-        <article class="kpi-card"><div class="kpi-label">BASE PRÓPRIA</div><div class="kpi-value" id="kpiOwn">—</div><div class="kpi-foot"><span id="kpiOwnPct">—</span> do total</div></article>
-        <article class="kpi-card"><div class="kpi-label">FRANQUIA</div><div class="kpi-value" id="kpiFranchise">—</div><div class="kpi-foot"><span id="kpiFranchisePct">—</span> do total</div></article>
-        <article class="kpi-card"><div class="kpi-label">BASES ENVOLVIDAS</div><div class="kpi-value" id="kpiBases">—</div><div class="kpi-foot">Estações com PNR no período</div></article>
-        <article class="kpi-card"><div class="kpi-label">MOTORISTAS</div><div class="kpi-value" id="kpiDrivers">—</div><div class="kpi-foot">Motoristas distintos</div></article>
+        <article class="kpi-card primary-kpi"><div class="kpi-label" data-i18n="pnrPeriod">PNR NO PERÍODO</div><div class="kpi-value" id="kpiTotal">—</div><div class="kpi-foot" data-i18n="totalTickets">Total de tickets no recorte</div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="ownBase">BASE PRÓPRIA</div><div class="kpi-value" id="kpiOwn">—</div><div class="kpi-foot"><span id="kpiOwnPct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="franchise">FRANQUIA</div><div class="kpi-value" id="kpiFranchise">—</div><div class="kpi-foot"><span id="kpiFranchisePct">—</span> <span data-i18n="ofTotal">do total</span></div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="basesInvolved">BASES ENVOLVIDAS</div><div class="kpi-value" id="kpiBases">—</div><div class="kpi-foot" data-i18n="stationsWithPnr">Estações com PNR no período</div></article>
+        <article class="kpi-card"><div class="kpi-label" data-i18n="drivers">MOTORISTAS</div><div class="kpi-value" id="kpiDrivers">—</div><div class="kpi-foot" data-i18n="distinctDrivers">Motoristas distintos</div></article>
       </section>
 
       <section class="grid-2">
         <article class="panel data-panel">
-          <div class="panel-head"><div><span class="section-kicker">GESTÃO</span><h2>Ranking por RM</h2></div><span class="context-pill" id="rmCountBadge">0 RMs</span></div>
-          <div class="table-scroll"><table class="data-table"><thead><tr><th>#</th><th>RM</th><th class="num">PNR</th><th class="num">Própria</th><th class="num">Franquia</th><th class="num">Participação</th></tr></thead><tbody id="rmTableBody"></tbody></table></div>
+          <div class="panel-head"><div><span class="section-kicker" data-i18n="management">GESTÃO</span><h2 data-i18n="rmRanking">Ranking por RM</h2></div><span class="context-pill" id="rmCountBadge">0 RMs</span></div>
+          <div class="table-scroll"><table class="data-table"><thead><tr><th>#</th><th>RM</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="share">Participação</th></tr></thead><tbody id="rmTableBody"></tbody></table></div>
         </article>
 
         <article class="panel data-panel">
-          <div class="panel-head"><div><span class="section-kicker">DISTRIBUIÇÃO</span><h2>Base própria x franquia</h2></div><span class="context-pill">TIPO DE ESTAÇÃO</span></div>
-          <div class="station-cards" id="stationCards"></div>
+          <div class="panel-head"><div><span class="section-kicker" data-i18n="distribution">DISTRIBUIÇÃO</span><h2 data-i18n="ownVsFranchise">Base própria x franquia</h2></div><span class="context-pill" data-i18n="stationType">TIPO DE ESTAÇÃO</span></div>
+          <div class="table-scroll station-table-wrap">
+            <table class="data-table station-summary-table">
+              <thead><tr><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="share">Participação</th><th class="num" data-i18n="bases">Bases</th><th data-i18n="topBase">Top base</th></tr></thead>
+              <tbody id="stationTableBody"></tbody>
+            </table>
+          </div>
         </article>
       </section>
 
       <section class="grid-3">
-        <article class="panel ranking-panel"><div class="panel-head compact"><div><span class="section-kicker">TOP 10</span><h2>Bases mais ofensoras</h2></div><span class="rank-icon">B</span></div><div class="ranking-list" id="topBases"></div></article>
-        <article class="panel ranking-panel"><div class="panel-head compact"><div><span class="section-kicker">TOP 10</span><h2>Motoristas ofensores</h2></div><span class="rank-icon">M</span></div><div class="ranking-list" id="topDrivers"></div></article>
-        <article class="panel ranking-panel"><div class="panel-head compact"><div><span class="section-kicker">TOP 10</span><h2>Origem do pedido</h2></div><span class="rank-icon">O</span></div><div class="ranking-list" id="topOrigins"></div></article>
+        <article class="panel ranking-panel"><div class="panel-head compact"><div><span class="section-kicker">TOP 10</span><h2 data-i18n="topBases">Bases mais ofensoras</h2></div><span class="rank-icon">B</span></div><div class="ranking-list" id="topBases"></div></article>
+        <article class="panel ranking-panel"><div class="panel-head compact"><div><span class="section-kicker">TOP 10</span><h2 data-i18n="topDrivers">Motoristas ofensores</h2></div><span class="rank-icon">M</span></div><div class="ranking-list" id="topDrivers"></div></article>
+        <article class="panel ranking-panel"><div class="panel-head compact"><div><span class="section-kicker">TOP 10</span><h2 data-i18n="topOrigins">Origem do pedido</h2></div><span class="rank-icon">O</span></div><div class="ranking-list" id="topOrigins"></div></article>
       </section>
 
       <section class="panel trend-panel">
-        <div class="panel-head"><div><span class="section-kicker">EVOLUÇÃO</span><h2>PNR por dia</h2></div><span class="context-pill" id="periodBadge">—</span></div>
+        <div class="panel-head"><div><span class="section-kicker" data-i18n="evolution">EVOLUÇÃO</span><h2 data-i18n="pnrPerDay">PNR por dia</h2></div><span class="context-pill" id="periodBadge">—</span></div>
         <div class="spark-chart" id="dailyChart"></div>
       </section>
     </div>
@@ -103,65 +108,51 @@
       <section class="panel editor-panel">
         <div class="editor-head">
           <div>
-            <span class="section-kicker">EDIÇÃO DA BASE</span>
-            <h2>Planilha do PNR</h2>
-            <p>Altere os registros diretamente aqui. Ao salvar, os indicadores são recalculados e a mudança aparece para todos os usuários conectados.</p>
+            <span class="section-kicker" data-i18n="baseEditing">EDIÇÃO DA BASE</span>
+            <h2 data-i18n="pnrSpreadsheet">Planilha do PNR</h2>
+            <p data-i18n="editorDescription">Altere os registros diretamente aqui. Ao salvar, os indicadores são recalculados e a mudança aparece para todos os usuários conectados.</p>
           </div>
           <div class="editor-head-actions">
-            <button class="ghost-btn" id="editorRefreshBtn" type="button">Atualizar lista</button>
-            <button class="ghost-btn" id="editorAddBtn" type="button">+ Nova linha</button>
-            <button class="primary-btn" id="editorSaveBtn" type="button">Salvar alterações <span id="dirtyCount" class="dirty-count">0</span></button>
+            <button class="ghost-btn" id="editorRefreshBtn" type="button" data-i18n="refreshList">Atualizar lista</button>
+            <button class="ghost-btn" id="editorAddBtn" type="button" data-i18n="newRow">+ Nova linha</button>
+            <button class="primary-btn" id="editorSaveBtn" type="button"><span data-i18n="saveChanges">Salvar alterações</span> <span id="dirtyCount" class="dirty-count">0</span></button>
           </div>
         </div>
 
         <div class="editor-filter-bar">
-          <label class="field"><span>Data inicial</span><input id="editorStartDate" type="date"></label>
-          <label class="field"><span>Data final</span><input id="editorEndDate" type="date"></label>
-          <label class="field"><span>Regional</span><select id="editorRegionalFilter"></select></label>
-          <label class="field"><span>Supervisor</span><select id="editorSupervisorFilter"></select></label>
+          <label class="field"><span data-i18n="startDate">Data inicial</span><input id="editorStartDate" type="date"></label>
+          <label class="field"><span data-i18n="endDate">Data final</span><input id="editorEndDate" type="date"></label>
+          <label class="field"><span data-i18n="regional">Regional</span><select id="editorRegionalFilter"></select></label>
+          <label class="field"><span data-i18n="supervisor">Supervisor</span><select id="editorSupervisorFilter"></select></label>
           <label class="field"><span>RM</span><select id="editorRmFilter"></select></label>
-          <label class="field"><span>Tipo de estação</span><select id="editorStationFilter"></select></label>
-          <label class="field"><span>Estação / Base</span><select id="editorBaseFilter"></select></label>
-          <label class="field"><span>Atendimento</span><select id="editorAtendimentoFilter"></select></label>
-          <label class="field editor-search"><span>Buscar em qualquer coluna</span><input id="editorSearch" type="search" placeholder="Ticket, motorista, base, origem..."></label>
-          <label class="field"><span>Linhas por página</span><select id="editorPageSize"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label>
-          <label class="field editor-key"><span>Chave de edição (se configurada)</span><input id="editorAdminKey" type="password" placeholder="ADMIN_KEY"></label>
-          <div class="editor-filter-actions"><button class="ghost-btn" id="editorClearBtn" type="button">Limpar</button><button class="primary-btn" id="editorApplyBtn" type="button">Aplicar filtros</button></div>
+          <label class="field"><span data-i18n="stationType">Tipo de estação</span><select id="editorStationFilter"></select></label>
+          <label class="field"><span data-i18n="stationBase">Estação / Base</span><select id="editorBaseFilter"></select></label>
+          <label class="field"><span data-i18n="service">Atendimento</span><select id="editorAtendimentoFilter"></select></label>
+          <label class="field editor-search"><span data-i18n="searchAnyColumn">Buscar em qualquer coluna</span><input id="editorSearch" type="search" data-i18n-placeholder="searchPlaceholder" placeholder="Ticket, motorista, base, origem..."></label>
+          <label class="field"><span data-i18n="rowsPerPage">Linhas por página</span><select id="editorPageSize"><option value="25">25</option><option value="50">50</option><option value="100">100</option></select></label>
+          <label class="field editor-key"><span data-i18n="editPassword">Senha para aplicar alterações</span><input id="editorAdminKey" type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Digite a senha"></label>
+          <div class="editor-filter-actions"><button class="ghost-btn" id="editorClearBtn" type="button" data-i18n="clear">Limpar</button><button class="primary-btn" id="editorApplyBtn" type="button" data-i18n="applyFilters">Aplicar filtros</button></div>
         </div>
 
         <div class="editor-info-row">
           <span id="editorResultCount">— registros</span>
-          <span id="editorUnsavedHint">As células alteradas ficam destacadas até serem salvas.</span>
+          <span id="editorUnsavedHint" data-i18n="unsavedHint">As células alteradas ficam destacadas até serem salvas.</span>
         </div>
 
         <div class="editor-table-wrap">
           <table class="editor-table">
-            <thead>
-              <tr>
-                <th class="sticky-col id-col">ID</th>
-                <th>Data</th>
-                <th>Regional</th>
-                <th>Ticket</th>
-                <th>Origem do pedido</th>
-                <th>Base</th>
-                <th>Motorista</th>
-                <th>RM</th>
-                <th>Supervisor</th>
-                <th>Tipo estação</th>
-                <th>Atendimento</th>
-                <th>Motivo N1</th>
-                <th>Motivo N2</th>
-                <th class="action-col">Ação</th>
-              </tr>
-            </thead>
+            <thead><tr>
+              <th class="sticky-col id-col">ID</th>
+              <th data-i18n="date">Data</th><th data-i18n="regional">Regional</th><th data-i18n="ticket">Ticket</th><th data-i18n="orderOrigin">Origem do pedido</th><th data-i18n="base">Base</th><th data-i18n="driver">Motorista</th><th>RM</th><th data-i18n="supervisor">Supervisor</th><th data-i18n="stationType">Tipo estação</th><th data-i18n="service">Atendimento</th><th data-i18n="reasonN1">Motivo N1</th><th data-i18n="reasonN2">Motivo N2</th><th class="action-col" data-i18n="action">Ação</th>
+            </tr></thead>
             <tbody id="editorTableBody"></tbody>
           </table>
         </div>
 
         <div class="editor-pagination">
-          <button class="ghost-btn" id="editorPrevBtn" type="button">← Anterior</button>
+          <button class="ghost-btn" id="editorPrevBtn" type="button" data-i18n="previous">← Anterior</button>
           <span id="editorPageLabel">Página 1 de 1</span>
-          <button class="ghost-btn" id="editorNextBtn" type="button">Próxima →</button>
+          <button class="ghost-btn" id="editorNextBtn" type="button" data-i18n="next">Próxima →</button>
         </div>
       </section>
     </div>
@@ -173,22 +164,22 @@
     <div class="modal-card" role="dialog" aria-modal="true" aria-labelledby="modalTitle">
       <button class="modal-close" id="modalClose" type="button" aria-label="Fechar">×</button>
       <div class="modal-icon">↥</div>
-      <span class="section-kicker">ATUALIZAÇÃO COMPARTILHADA</span>
-      <h2 id="modalTitle">Atualizar base do PNR</h2>
-      <p>Envie a nova planilha <strong>.xlsx</strong>. A base atual será substituída e todos os usuários conectados receberão a atualização automaticamente.</p>
+      <span class="section-kicker" data-i18n="sharedUpdate">ATUALIZAÇÃO COMPARTILHADA</span>
+      <h2 id="modalTitle" data-i18n="updatePnrBase">Atualizar base do PNR</h2>
+      <p data-i18n="uploadDescription">Envie a nova planilha .xlsx. A base atual será substituída e todos os usuários conectados receberão a atualização automaticamente.</p>
       <label class="drop-zone" id="dropZone">
         <input id="fileInput" type="file" accept=".xlsx" hidden>
-        <span class="drop-title" id="dropTitle">Clique ou arraste a planilha aqui</span>
-        <span class="drop-help">Limite: 40 MB · os mesmos cabeçalhos da planilha atual</span>
+        <span class="drop-title" id="dropTitle" data-i18n="dropTitle">Clique ou arraste a planilha aqui</span>
+        <span class="drop-help" data-i18n="dropHelp">Limite: 40 MB · os mesmos cabeçalhos da planilha atual</span>
       </label>
-      <label class="field admin-key-field" id="adminKeyWrap"><span>Chave de atualização (se configurada no Railway)</span><input id="adminKey" type="password" placeholder="ADMIN_KEY"></label>
-      <div class="upload-progress-wrap" id="uploadProgressWrap"><div class="upload-progress"><span id="uploadProgressBar"></span></div><small id="uploadStatus">Preparando...</small></div>
-      <button class="primary-btn full" id="sendUpload" type="button">Importar e publicar atualização</button>
+      <label class="field admin-key-field"><span data-i18n="updatePassword">Senha para atualizar os dados</span><input id="adminKey" type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Digite a senha"></label>
+      <div class="upload-progress-wrap" id="uploadProgressWrap"><div class="upload-progress"><span id="uploadProgressBar"></span></div><small id="uploadStatus" data-i18n="preparing">Preparando...</small></div>
+      <button class="primary-btn full" id="sendUpload" type="button" data-i18n="importPublish">Importar e publicar atualização</button>
     </div>
   </div>
 
   <div class="toast-stack" id="toastStack"></div>
-  <div class="loading-layer" id="loadingLayer"><div class="loader"></div><span>Atualizando indicadores...</span></div>
+  <div class="loading-layer" id="loadingLayer"><div class="loader"></div><span data-i18n="updatingIndicators">Atualizando indicadores...</span></div>
 
   <script src="{{ url_for('static', filename='js/app.js') }}"></script>
 </body>

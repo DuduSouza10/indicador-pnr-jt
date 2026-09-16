@@ -2,12 +2,14 @@ import os
 import re
 import threading
 from collections import defaultdict
+from io import BytesIO
 from datetime import date, datetime
 from pathlib import Path
 from tempfile import NamedTemporaryFile
 
-from flask import Flask, jsonify, render_template, request
-from openpyxl import load_workbook
+from flask import Flask, jsonify, render_template, request, send_file
+from openpyxl import Workbook, load_workbook
+from openpyxl.styles import Alignment, Font, PatternFill
 from sqlalchemy import (
     Column,
     Date,
@@ -76,6 +78,7 @@ Base.metadata.create_all(engine)
 app = Flask(__name__)
 app.config["MAX_CONTENT_LENGTH"] = 40 * 1024 * 1024
 IMPORT_LOCK = threading.Lock()
+EDIT_PASSWORD = "3264542"
 
 
 def clean_text(value):
@@ -134,7 +137,9 @@ def parse_date(value):
 
 
 HEADER_ALIASES = {
-    "data": {"data"},
+    # O filtro continua sendo exibido como Data, mas prioriza a coluna "Hora de Envio".
+    # "Data" permanece como fallback para a planilha seed antiga.
+    "data": ("hora de envio", "data"),
     "filial": {"filial", "regional"},
     "ticket_number": {"numero do ticket", "ticket", "n do ticket"},
     "order_source": {"origem do pedido", "origem pedido"},
@@ -424,13 +429,135 @@ def dashboard_data():
         })
 
 
+
+
+def _export_headers(lang):
+    if lang == "zh-CN":
+        return {
+            "rm": ["排名", "RM", "PNR", "直营网点", "加盟网点", "占比"],
+            "station": ["网点类型", "PNR", "占比", "网点数量", "主要网点"],
+            "rank": ["排名", "名称", "PNR"],
+            "daily": ["日期", "PNR"],
+        }
+    return {
+        "rm": ["Ranking", "RM", "PNR", "Base própria", "Franquia", "Participação"],
+        "station": ["Tipo de estação", "PNR", "Participação", "Bases", "Top base"],
+        "rank": ["Ranking", "Nome", "PNR"],
+        "daily": ["Data", "PNR"],
+    }
+
+
+def _style_export_sheet(ws):
+    header_fill = PatternFill("solid", fgColor="ED1C24")
+    header_font = Font(color="FFFFFF", bold=True)
+    for cell in ws[1]:
+        cell.fill = header_fill
+        cell.font = header_font
+        cell.alignment = Alignment(horizontal="center")
+    ws.freeze_panes = "A2"
+    for column_cells in ws.columns:
+        width = max((len(str(c.value)) if c.value is not None else 0) for c in column_cells)
+        ws.column_dimensions[column_cells[0].column_letter].width = min(max(width + 2, 12), 42)
+
+
+def _append_export_sheet(wb, title, headers, rows):
+    ws = wb.create_sheet(title=title[:31])
+    ws.append(headers)
+    for row in rows:
+        ws.append(row)
+    _style_export_sheet(ws)
+    return ws
+
+
+@app.get("/api/export")
+def export_tables():
+    conditions = build_conditions(request.args)
+    lang = clean_text(request.args.get("lang")) or "pt-BR"
+    h = _export_headers(lang)
+
+    with SessionLocal() as session:
+        total = int(session.scalar(select(func.count(PNRRecord.id)).where(*conditions)) or 0)
+
+        rm_stmt = (
+            select(
+                PNRRecord.rm,
+                func.count(PNRRecord.id).label("total"),
+                func.sum(case((PNRRecord.station == "Própria", 1), else_=0)).label("own"),
+                func.sum(case((PNRRecord.station == "Franquia", 1), else_=0)).label("franchise"),
+            )
+            .where(*conditions)
+            .group_by(PNRRecord.rm)
+            .order_by(func.count(PNRRecord.id).desc())
+        )
+        rm_export = []
+        for pos, (rm, cnt, own_cnt, fran_cnt) in enumerate(session.execute(rm_stmt), start=1):
+            cnt = int(cnt or 0)
+            rm_export.append([pos, rm or "Não informado", cnt, int(own_cnt or 0), int(fran_cnt or 0), cnt / total if total else 0])
+
+        station_export = []
+        for station_name in ("Própria", "Franquia"):
+            station_conditions = conditions + [PNRRecord.station == station_name]
+            cnt = int(session.scalar(select(func.count(PNRRecord.id)).where(*station_conditions)) or 0)
+            base_cnt = int(session.scalar(select(func.count(func.distinct(PNRRecord.base))).where(*station_conditions)) or 0)
+            top = grouped_counts(session, PNRRecord.base, station_conditions, 1)
+            station_label = ("直营网点" if station_name == "Própria" else "加盟网点") if lang == "zh-CN" else station_name
+            station_export.append([station_label, cnt, cnt / total if total else 0, base_cnt, top[0]["label"] if top else "—"])
+
+        def top_rows(column):
+            return [[i, item["label"], item["count"]] for i, item in enumerate(grouped_counts(session, column, conditions, 10), start=1)]
+
+        top_bases_export = top_rows(PNRRecord.base)
+        top_drivers_export = top_rows(PNRRecord.driver)
+        top_origins_export = top_rows(PNRRecord.order_source)
+
+        daily_stmt = (
+            select(PNRRecord.data, func.count(PNRRecord.id))
+            .where(*conditions)
+            .group_by(PNRRecord.data)
+            .order_by(PNRRecord.data.asc())
+        )
+        daily_export = [[d, int(c)] for d, c in session.execute(daily_stmt)]
+
+    wb = Workbook()
+    wb.remove(wb.active)
+    titles = {
+        "rm": "RM排名" if lang == "zh-CN" else "Ranking RM",
+        "station": "直营网点与加盟网点" if lang == "zh-CN" else "Própria x Franquia",
+        "bases": "TOP10网点" if lang == "zh-CN" else "Top 10 Bases",
+        "drivers": "TOP10司机" if lang == "zh-CN" else "Top 10 Motoristas",
+        "origins": "TOP10订单来源" if lang == "zh-CN" else "Top 10 Origens",
+        "daily": "每日PNR" if lang == "zh-CN" else "PNR por dia",
+    }
+    ws_rm = _append_export_sheet(wb, titles["rm"], h["rm"], rm_export)
+    for row in ws_rm.iter_rows(min_row=2, min_col=6, max_col=6):
+        row[0].number_format = "0.0%"
+    ws_station = _append_export_sheet(wb, titles["station"], h["station"], station_export)
+    for row in ws_station.iter_rows(min_row=2, min_col=3, max_col=3):
+        row[0].number_format = "0.0%"
+    _append_export_sheet(wb, titles["bases"], h["rank"], top_bases_export)
+    _append_export_sheet(wb, titles["drivers"], h["rank"], top_drivers_export)
+    _append_export_sheet(wb, titles["origins"], h["rank"], top_origins_export)
+    ws_daily = _append_export_sheet(wb, titles["daily"], h["daily"], daily_export)
+    for row in ws_daily.iter_rows(min_row=2, min_col=1, max_col=1):
+        row[0].number_format = "dd/mm/yyyy"
+
+    buffer = BytesIO()
+    wb.save(buffer)
+    buffer.seek(0)
+    stamp = datetime.now().strftime("%Y%m%d_%H%M%S")
+    return send_file(
+        buffer,
+        as_attachment=True,
+        download_name=f"Indicador_PNR_{stamp}.xlsx",
+        mimetype="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+    )
+
+
 @app.post("/api/upload")
 def upload_data():
-    configured_key = os.getenv("ADMIN_KEY", "").strip()
-    if configured_key:
-        provided = request.headers.get("X-Admin-Key", "").strip() or request.form.get("admin_key", "").strip()
-        if provided != configured_key:
-            return jsonify({"ok": False, "message": "Chave de atualização inválida."}), 401
+    provided = request.headers.get("X-Admin-Key", "").strip() or request.form.get("admin_key", "").strip()
+    if provided != EDIT_PASSWORD:
+        return jsonify({"ok": False, "message": "Senha inválida. As alterações não foram aplicadas."}), 401
 
     uploaded = request.files.get("file")
     if not uploaded or not uploaded.filename:
@@ -479,11 +606,8 @@ def _provided_admin_key(payload=None):
 
 
 def require_admin(payload=None):
-    configured_key = os.getenv("ADMIN_KEY", "").strip()
-    if not configured_key:
-        return None
-    if _provided_admin_key(payload) != configured_key:
-        return jsonify({"ok": False, "message": "Chave de edição inválida."}), 401
+    if _provided_admin_key(payload) != EDIT_PASSWORD:
+        return jsonify({"ok": False, "message": "Senha inválida. As alterações não foram aplicadas."}), 401
     return None
 
 
