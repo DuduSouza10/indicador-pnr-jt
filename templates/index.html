@@ -295,18 +295,26 @@
       <h2 id="modalTitle" data-i18n="updateBothBases">Atualizar PNR BI + Entregas BI</h2>
       <p data-i18n="dualUploadDescription">As duas planilhas são obrigatórias. A atualização só será publicada quando PNR BI e Entregas BI forem enviadas juntas e validadas.</p>
       <div class="dual-upload-grid">
-        <label class="drop-zone" id="pnrDropZone">
+        <div class="drop-zone upload-file-card" id="pnrDropZone">
           <input id="pnrFileInput" type="file" accept=".xlsx" hidden>
-          <strong data-i18n="pnrBi">PNR BI</strong>
-          <span class="drop-title" id="pnrDropTitle" data-i18n="selectPnrBi">Selecionar planilha PNR BI</span>
+          <div class="upload-file-head">
+            <strong data-i18n="pnrBi">PNR BI</strong>
+            <span class="required-pill" data-i18n="requiredLabel">Obrigatório</span>
+          </div>
           <span class="drop-help" data-i18n="pnrHelp">Base de reclamações e valor de mercadoria</span>
-        </label>
-        <label class="drop-zone" id="deliveryDropZone">
+          <span class="drop-title file-status" id="pnrDropTitle" data-i18n="noFileSelected">Nenhum arquivo selecionado</span>
+          <button class="file-add-btn" id="pnrAddBtn" type="button"><span class="file-add-icon">＋</span><span data-i18n="addFile">Adicionar</span></button>
+        </div>
+        <div class="drop-zone upload-file-card" id="deliveryDropZone">
           <input id="deliveryFileInput" type="file" accept=".xlsx" hidden>
-          <strong data-i18n="deliveryBi">Entregas BI</strong>
-          <span class="drop-title" id="deliveryDropTitle" data-i18n="selectDeliveryBi">Selecionar planilha Entregas BI</span>
-          <span class="drop-help" data-i18n="deliveryHelp">Volume de entregas por data e RM</span>
-        </label>
+          <div class="upload-file-head">
+            <strong data-i18n="deliveryBi">Entregas BI</strong>
+            <span class="required-pill" data-i18n="requiredLabel">Obrigatório</span>
+          </div>
+          <span class="drop-help" data-i18n="deliveryHelp">Volume de entregas por data, RM e Base</span>
+          <span class="drop-title file-status" id="deliveryDropTitle" data-i18n="noFileSelected">Nenhum arquivo selecionado</span>
+          <button class="file-add-btn" id="deliveryAddBtn" type="button"><span class="file-add-icon">＋</span><span data-i18n="addFile">Adicionar</span></button>
+        </div>
       </div>
       <div class="dual-required-note" data-i18n="bothRequired">Obrigatório: envie os dois arquivos na mesma atualização.</div>
       <label class="field admin-key-field"><span data-i18n="updatePassword">Senha para atualizar os dados</span><input id="adminKey" type="password" data-i18n-placeholder="passwordPlaceholder" placeholder="Digite a senha"></label>

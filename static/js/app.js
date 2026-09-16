@@ -33,7 +33,7 @@ const I18N = {
     baseEditing: 'EDIÇÃO DA BASE', pnrSpreadsheet: 'Planilha PNR BI', editorDescription: 'Altere os registros do PNR BI diretamente aqui. Ao salvar, os indicadores são recalculados e a mudança aparece para todos os usuários conectados.', refreshList: 'Atualizar lista', newRow: '+ Nova linha', saveChanges: 'Salvar alterações',
     searchAnyColumn: 'Buscar em qualquer coluna', searchPlaceholder: 'Ticket, motorista, base, origem...', rowsPerPage: 'Linhas por página', editPassword: 'Senha para aplicar alterações', passwordPlaceholder: 'Digite a senha', clear: 'Limpar', applyFilters: 'Aplicar filtros', unsavedHint: 'As células alteradas ficam destacadas até serem salvas.',
     date: 'Data', ticket: 'Ticket', orderOrigin: 'Origem do pedido', base: 'Base', driver: 'Motorista', reasonN1: 'Motivo N1', reasonN2: 'Motivo N2', action: 'Ação', previous: '← Anterior', next: 'Próxima →',
-    sharedUpdate: 'ATUALIZAÇÃO COMPARTILHADA', updateBothBases: 'Atualizar PNR BI + Entregas BI', dualUploadDescription: 'As duas planilhas são obrigatórias. A atualização só será publicada quando PNR BI e Entregas BI forem enviadas juntas e validadas.', pnrBi: 'PNR BI', deliveryBi: 'Entregas BI', selectPnrBi: 'Selecionar planilha PNR BI', selectDeliveryBi: 'Selecionar planilha Entregas BI', pnrHelp: 'Base de reclamações e valor de mercadoria', deliveryHelp: 'Volume de entregas por data, RM e Base', bothRequired: 'Obrigatório: envie os dois arquivos na mesma atualização.', updatePassword: 'Senha para atualizar os dados', preparing: 'Preparando...', importPublishBoth: 'Importar as duas e publicar', updatingIndicators: 'Atualizando indicadores...',
+    sharedUpdate: 'ATUALIZAÇÃO COMPARTILHADA', updateBothBases: 'Atualizar PNR BI + Entregas BI', dualUploadDescription: 'As duas planilhas são obrigatórias. A atualização só será publicada quando PNR BI e Entregas BI forem enviadas juntas e validadas.', pnrBi: 'PNR BI', deliveryBi: 'Entregas BI', selectPnrBi: 'Selecionar planilha PNR BI', selectDeliveryBi: 'Selecionar planilha Entregas BI', pnrHelp: 'Base de reclamações e valor de mercadoria', deliveryHelp: 'Volume de entregas por data, RM e Base', bothRequired: 'Obrigatório: envie os dois arquivos na mesma atualização.', requiredLabel: 'Obrigatório', addFile: 'Adicionar', replaceFile: 'Trocar arquivo', noFileSelected: 'Nenhum arquivo selecionado', readyToPublish: 'Os dois arquivos foram adicionados. Digite a senha e publique a atualização.', updatePassword: 'Senha para atualizar os dados', preparing: 'Preparando...', importPublishBoth: 'Importar as duas e publicar', updatingIndicators: 'Atualizando indicadores...',
     noDataFilters: 'Nenhum dado para os filtros selecionados.', noDataPeriod: 'Nenhum dado para o período.', noDaily: 'Sem dados diários para exibir.', noEditorRows: 'Nenhum registro encontrado com esses filtros.', noChartData: 'Sem dados de taxa para exibir neste período.',
     recordsFound: '{n} registros encontrados', pageOf: 'Página {page} de {pages}', rowsInBase: '{n} PNR · {d} linhas de Entregas BI', rms: '{n} RMs', pnrOf: 'do PNR', top: 'Top',
     selectBothXlsx: 'Selecione as duas planilhas: PNR BI e Entregas BI.', xlsxOnly: 'As duas planilhas devem ser .xlsx.', validatingImport: 'Validando PNR BI e Entregas BI...', importedRows: '{n} PNR e {d} linhas de entregas publicados.',
@@ -55,7 +55,7 @@ const I18N = {
     baseEditing: '数据编辑', pnrSpreadsheet: 'PNR BI 数据表', editorDescription: '可直接在此修改 PNR BI 记录。保存后指标会重新计算，并同步给所有在线用户。', refreshList: '刷新列表', newRow: '+ 新增一行', saveChanges: '保存修改',
     searchAnyColumn: '搜索任意列', searchPlaceholder: '工单、司机、网点、来源...', rowsPerPage: '每页行数', editPassword: '应用修改的密码', passwordPlaceholder: '请输入密码', clear: '清除', applyFilters: '应用筛选', unsavedHint: '已修改的单元格在保存前会保持高亮。',
     date: '日期', ticket: '工单', orderOrigin: '订单来源', base: '网点', driver: '司机', reasonN1: '原因 N1', reasonN2: '原因 N2', action: '操作', previous: '← 上一页', next: '下一页 →',
-    sharedUpdate: '共享更新', updateBothBases: '更新 PNR BI + Entregas BI', dualUploadDescription: '两个文件均为必填。只有 PNR BI 与 Entregas BI 同时上传并校验通过后才会发布更新。', pnrBi: 'PNR BI', deliveryBi: 'Entregas BI', selectPnrBi: '选择 PNR BI 表格', selectDeliveryBi: '选择 Entregas BI 表格', pnrHelp: '投诉及货值数据', deliveryHelp: '按日期、RM 和网点的配送量', bothRequired: '必填：同一次更新必须上传两个文件。', updatePassword: '更新数据的密码', preparing: '准备中...', importPublishBoth: '导入两个文件并发布', updatingIndicators: '正在更新指标...',
+    sharedUpdate: '共享更新', updateBothBases: '更新 PNR BI + Entregas BI', dualUploadDescription: '两个文件均为必填。只有 PNR BI 与 Entregas BI 同时上传并校验通过后才会发布更新。', pnrBi: 'PNR BI', deliveryBi: 'Entregas BI', selectPnrBi: '选择 PNR BI 表格', selectDeliveryBi: '选择 Entregas BI 表格', pnrHelp: '投诉及货值数据', deliveryHelp: '按日期、RM 和网点的配送量', bothRequired: '必填：同一次更新必须上传两个文件。', requiredLabel: '必填', addFile: '添加', replaceFile: '更换文件', noFileSelected: '尚未选择文件', readyToPublish: '两个文件均已添加。请输入密码并发布更新。', updatePassword: '更新数据的密码', preparing: '准备中...', importPublishBoth: '导入两个文件并发布', updatingIndicators: '正在更新指标...',
     noDataFilters: '当前筛选条件下没有数据。', noDataPeriod: '该周期内没有数据。', noDaily: '没有可显示的每日数据。', noEditorRows: '当前筛选条件下没有记录。', noChartData: '该周期内没有可显示的费率数据。',
     recordsFound: '找到 {n} 条记录', pageOf: '第 {page} 页，共 {pages} 页', rowsInBase: 'PNR {n} 条 · Entregas BI {d} 行', rms: '{n} 个 RM', pnrOf: '占 PNR', top: '最高',
     selectBothXlsx: '请选择 PNR BI 和 Entregas BI 两个表格。', xlsxOnly: '两个文件都必须为 .xlsx。', validatingImport: '正在校验 PNR BI 和 Entregas BI...', importedRows: '已发布 {n} 条 PNR 和 {d} 行配送数据。',
@@ -104,6 +104,7 @@ function applyTranslations() {
   if (state.lastCharts) renderCharts(state.lastCharts);
   if (state.regionalRates) renderRegionalRates(state.regionalRates);
   if (state.editor.loaded) refreshEditorLabels();
+  if ($('uploadModal')) refreshUploadLabels();
 }
 
 async function api(url, options = {}) {
@@ -456,11 +457,49 @@ function renderRmLineChart(data){
 }
 async function resetCharts(){state.chartSelectedRms.clear();$('chartRegionalFilter').value='__all__';$('chartStartDate').value=state.filters?.delivery_date_min||state.filters?.date_min||'';$('chartEndDate').value=state.filters?.delivery_date_max||state.filters?.date_max||'';renderChartRmChips();await loadCharts();}
 
-function openModal(){$('uploadModal').classList.add('show');$('uploadModal').setAttribute('aria-hidden','false');$('pnrFileInput').value='';$('deliveryFileInput').value='';$('pnrDropTitle').textContent=t('selectPnrBi');$('deliveryDropTitle').textContent=t('selectDeliveryBi');$('uploadProgressWrap').classList.remove('show');$('uploadProgressBar').style.width='0%';}
-function closeModal(){$('uploadModal').classList.remove('show');$('uploadModal').setAttribute('aria-hidden','true');}
+function refreshUploadLabels(){
+  const pnr=$('pnrFileInput')?.files?.[0],delivery=$('deliveryFileInput')?.files?.[0];
+  if($('pnrDropTitle'))$('pnrDropTitle').textContent=pnr?pnr.name:t('noFileSelected');
+  if($('deliveryDropTitle'))$('deliveryDropTitle').textContent=delivery?delivery.name:t('noFileSelected');
+  if($('pnrAddBtn'))$('pnrAddBtn').querySelector('span:last-child').textContent=pnr?t('replaceFile'):t('addFile');
+  if($('deliveryAddBtn'))$('deliveryAddBtn').querySelector('span:last-child').textContent=delivery?t('replaceFile'):t('addFile');
+}
+function updateUploadReadyState(){
+  const pnr=$('pnrFileInput').files[0],delivery=$('deliveryFileInput').files[0];
+  $('pnrDropZone').classList.toggle('selected',!!pnr);
+  $('deliveryDropZone').classList.toggle('selected',!!delivery);
+  const ready=!!pnr&&!!delivery&&validXlsx(pnr)&&validXlsx(delivery);
+  $('sendUpload').disabled=!ready;
+  $('uploadModal').classList.toggle('files-ready',ready);
+  if(ready){$('uploadStatus').textContent=t('readyToPublish');}
+}
+function resetUploadCard(){
+  $('pnrFileInput').value='';$('deliveryFileInput').value='';
+  $('pnrDropTitle').textContent=t('noFileSelected');$('deliveryDropTitle').textContent=t('noFileSelected');
+  $('pnrAddBtn').querySelector('span:last-child').textContent=t('addFile');$('deliveryAddBtn').querySelector('span:last-child').textContent=t('addFile');
+  $('adminKey').value='';$('uploadProgressWrap').classList.remove('show');$('uploadProgressBar').style.width='0%';$('uploadStatus').textContent=t('preparing');
+  updateUploadReadyState();
+}
+function openModal(){const modal=$('uploadModal');resetUploadCard();modal.classList.add('show');modal.setAttribute('aria-hidden','false');document.body.classList.add('modal-open');setTimeout(()=>$('pnrAddBtn').focus(),30);}
+function closeModal(){const modal=$('uploadModal');modal.classList.remove('show');modal.setAttribute('aria-hidden','true');document.body.classList.remove('modal-open');}
 function validXlsx(file){return !!file&&file.name.toLowerCase().endsWith('.xlsx');}
-function setupDropZone(zoneId,inputId,titleId){const zone=$(zoneId),input=$(inputId);input.addEventListener('change',()=>{const f=input.files[0];if(f)$(titleId).textContent=f.name;});['dragenter','dragover'].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();zone.classList.add('drag');}));['dragleave','drop'].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();zone.classList.remove('drag');}));zone.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(!f)return;const dt=new DataTransfer();dt.items.add(f);input.files=dt.files;$(titleId).textContent=f.name;});}
-async function sendUpload(){const pnr=$('pnrFileInput').files[0],delivery=$('deliveryFileInput').files[0],key=$('adminKey').value.trim();if(!pnr||!delivery)return toast(t('selectBothXlsx'),'error');if(!validXlsx(pnr)||!validXlsx(delivery))return toast(t('xlsxOnly'),'error');if(!key)return toast(t('passwordRequired'),'error');const form=new FormData();form.append('pnr_file',pnr);form.append('delivery_file',delivery);form.append('admin_key',key);$('uploadProgressWrap').classList.add('show');$('uploadProgressBar').style.width='35%';$('uploadStatus').textContent=t('validatingImport');$('sendUpload').disabled=true;try{const result=await api('/api/upload',{method:'POST',body:form});$('uploadProgressBar').style.width='100%';toast(t('importedRows',{n:formatNum(result.rows),d:formatNum(result.delivery_rows)}),'success');closeModal();await loadFilters();await Promise.all([loadDashboard(),loadMeta()]);if(state.lastBaseDashboard||state.activeView==='bases')await loadBaseDashboard();if(state.activeView==='charts')await loadCharts();if(state.activeView==='editor')await loadEditorRows({preserveDirty:false});}catch(err){toast(err.message,'error');$('uploadProgressBar').style.width='0%';}finally{$('sendUpload').disabled=false;}}
+function setUploadFile(inputId,titleId,buttonId,file){
+  const input=$(inputId);
+  if(file){const dt=new DataTransfer();dt.items.add(file);input.files=dt.files;}
+  const selected=input.files[0];
+  $(titleId).textContent=selected?selected.name:t('noFileSelected');
+  $(buttonId).querySelector('span:last-child').textContent=selected?t('replaceFile'):t('addFile');
+  updateUploadReadyState();
+}
+function setupDropZone(zoneId,inputId,titleId,buttonId){
+  const zone=$(zoneId),input=$(inputId),button=$(buttonId);
+  button.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();input.click();});
+  input.addEventListener('change',()=>setUploadFile(inputId,titleId,buttonId,null));
+  ['dragenter','dragover'].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();zone.classList.add('drag');}));
+  ['dragleave','drop'].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();zone.classList.remove('drag');}));
+  zone.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(!f)return;if(!validXlsx(f)){toast(t('xlsxOnly'),'error');return;}setUploadFile(inputId,titleId,buttonId,f);});
+}
+async function sendUpload(){const pnr=$('pnrFileInput').files[0],delivery=$('deliveryFileInput').files[0],key=$('adminKey').value.trim();if(!pnr||!delivery)return toast(t('selectBothXlsx'),'error');if(!validXlsx(pnr)||!validXlsx(delivery))return toast(t('xlsxOnly'),'error');if(!key)return toast(t('passwordRequired'),'error');const form=new FormData();form.append('pnr_file',pnr);form.append('delivery_file',delivery);form.append('admin_key',key);$('uploadProgressWrap').classList.add('show');$('uploadProgressBar').style.width='35%';$('uploadStatus').textContent=t('validatingImport');$('sendUpload').disabled=true;try{const result=await api('/api/upload',{method:'POST',body:form});$('uploadProgressBar').style.width='100%';toast(t('importedRows',{n:formatNum(result.rows),d:formatNum(result.delivery_rows)}),'success');closeModal();await loadFilters();await Promise.all([loadDashboard(),loadMeta()]);if(state.lastBaseDashboard||state.activeView==='bases')await loadBaseDashboard();if(state.activeView==='charts')await loadCharts();if(state.activeView==='editor')await loadEditorRows({preserveDirty:false});}catch(err){toast(err.message,'error');$('uploadProgressBar').style.width='0%';updateUploadReadyState();}finally{if($('uploadModal').classList.contains('show'))updateUploadReadyState();}}
 
 function switchView(view){state.activeView=view;document.querySelectorAll('.view-tab').forEach(b=>b.classList.toggle('active',b.dataset.view===view));document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));$(`${view}View`).classList.add('active');if(view==='editor'&&!state.editor.loaded)loadEditorRows({preserveDirty:false});else if(view==='editor')loadRegionalRates();if(view==='charts')loadCharts();if(view==='bases')loadBaseDashboard();if(view==='dashboard')loadRegionalRates();}
 function editorQueryString(){const p=new URLSearchParams();const pairs=[['start_date','editorStartDate'],['end_date','editorEndDate'],['regional','editorRegionalFilter'],['supervisor','editorSupervisorFilter'],['rm','editorRmFilter'],['station','editorStationFilter'],['base','editorBaseFilter'],['atendimento','editorAtendimentoFilter']];pairs.forEach(([k,id])=>{const v=$(id).value;if(v&&v!=='__all__')p.set(k,v);});if($('editorSearch').value.trim())p.set('q',$('editorSearch').value.trim());p.set('page',state.editor.page);p.set('page_size',$('editorPageSize').value);return p.toString();}
@@ -489,7 +528,7 @@ function bindEvents(){
   document.querySelectorAll('.base-quick-dates .chip[data-base-range]').forEach(btn=>btn.addEventListener('click',async()=>{baseRangeDates(btn.dataset.baseRange);baseMarkChip(btn.dataset.baseRange);await loadBaseDashboard();}));
   document.querySelectorAll('[data-base-kpi-filter]').forEach(card=>{const run=()=>applyBaseKpiCrossFilter(card.dataset.baseKpiFilter).catch(err=>toast(err.message,'error'));card.addEventListener('click',run);card.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();run();}});});
   $('clearClickFiltersBtn').addEventListener('click',()=>clearClickFilters().catch(err=>toast(err.message,'error')));$('resetBtn').addEventListener('click',resetFilters);$('exportBtn').addEventListener('click',exportTables);$('uploadBtn').addEventListener('click',openModal);$('baseClearClickFiltersBtn').addEventListener('click',()=>clearBaseClickFilters().catch(err=>toast(err.message,'error')));$('baseResetBtn').addEventListener('click',resetBaseFilters);$('baseExportBtn').addEventListener('click',exportBaseTables);$('baseUploadBtn').addEventListener('click',openModal);$('langToggle').addEventListener('click',toggleLanguage);$('modalClose').addEventListener('click',closeModal);$('uploadModal').addEventListener('click',e=>{if(e.target===$('uploadModal'))closeModal();});
-  setupDropZone('pnrDropZone','pnrFileInput','pnrDropTitle');setupDropZone('deliveryDropZone','deliveryFileInput','deliveryDropTitle');$('sendUpload').addEventListener('click',sendUpload);
+  setupDropZone('pnrDropZone','pnrFileInput','pnrDropTitle','pnrAddBtn');setupDropZone('deliveryDropZone','deliveryFileInput','deliveryDropTitle','deliveryAddBtn');$('sendUpload').addEventListener('click',sendUpload);
   document.querySelectorAll('.view-tab').forEach(btn=>btn.addEventListener('click',()=>switchView(btn.dataset.view)));
   ['chartStartDate','chartEndDate','chartRegionalFilter'].forEach(id=>$(id).addEventListener('change',()=>loadCharts()));$('chartResetBtn').addEventListener('click',resetCharts);
   $('editorApplyBtn').addEventListener('click',async()=>{state.editor.page=1;await loadEditorRows();});$('editorClearBtn').addEventListener('click',clearEditorFilters);$('editorRefreshBtn').addEventListener('click',()=>loadEditorRows());$('editorAddBtn').addEventListener('click',addEditorRow);$('editorSaveBtn').addEventListener('click',saveEditorRows);$('editorPrevBtn').addEventListener('click',async()=>{if(state.editor.page>1){state.editor.page-=1;await loadEditorRows();}});$('editorNextBtn').addEventListener('click',async()=>{if(state.editor.page<state.editor.pages){state.editor.page+=1;await loadEditorRows();}});$('editorPageSize').addEventListener('change',async()=>{state.editor.page=1;await loadEditorRows();});$('editorSearch').addEventListener('keydown',async e=>{if(e.key==='Enter'){e.preventDefault();state.editor.page=1;await loadEditorRows();}});document.addEventListener('keydown',e=>{if(e.key==='Escape')closeModal();});

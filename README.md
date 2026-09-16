@@ -74,3 +74,10 @@ python app.py
 - Taxa PNR e variação D-1 continuam exibidas como métricas, mas não definem mais a posição no ranking.
 
 - No Ranking por RM, a coluna **Base** foi renomeada para **Base mais ofensora** (inclusive na exportacao XLSX e na traducao para chines simplificado).
+
+## Modal de atualização em duas etapas
+- O botão **Atualizar dados** abre um card central com o restante da tela desfocado.
+- O card possui dois botões independentes **Adicionar**: um para **PNR BI** e outro para **Entregas BI**.
+- A publicação permanece bloqueada até que os dois arquivos `.xlsx` tenham sido selecionados.
+- O backend também rejeita qualquer tentativa de atualização com somente uma das planilhas, garantindo que a troca seja atômica.
+- A senha de alteração continua obrigatória antes da publicação.
