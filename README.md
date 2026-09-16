@@ -7,7 +7,7 @@ Dashboard Flask pronto para Railway, com PostgreSQL compartilhado, atualização
 O botão **Atualizar dados** exige os dois arquivos na mesma operação:
 
 1. **PNR BI** — reclamações, RM, tipo de estação e valor da mercadoria.
-2. **Entregas BI** — volume entregue por data/RM.
+2. **Entregas BI** — volume entregue por data/RM/Base.
 
 A atualização é transacional: se um dos arquivos faltar ou falhar na validação, nenhum dos dois bancos é substituído.
 
@@ -24,9 +24,14 @@ Por RM e por dia:
 - O pareamento de RM ignora diferenças de maiúsculas/minúsculas e acentuação.
 - O ranking exibe também Valor da Mercadoria, Taxa PNR do dia de referência e variação contra D-1.
 
+## Dashboards
+
+- **Dashboard Geral**: visão principal e ranking por RM.
+- **Dashboard - Bases/Franquias**: mesma leitura operacional, mas sem filtro de RM; o ranking, os filtros por clique e a Taxa PNR são baseados em Base/Franquia. A taxa por base cruza a Base do PNR BI com o Nome da base da Entregas BI.
+
 ## Página Gráficos
 
-A aba **Gráficos** contém filtros independentes de data, Regional e RM, cards consolidados e gráfico de linhas por RM com Taxa PNR e quantidade de reclamações em cada ponto.
+A aba **Gráficos** contém filtros independentes de data, Regional e RM, cards consolidados e um modelo Sparkline em faixas: cada RM fica em uma linha própria, com cor própria, datas no eixo inferior e bolinhas/rótulos de Taxa PNR + reclamações. Esse layout evita a sobreposição quando muitos RMs são exibidos juntos.
 
 ## Exportação XLSX
 

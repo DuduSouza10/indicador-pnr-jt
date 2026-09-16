@@ -229,7 +229,7 @@ DELIVERY_HEADER_ALIASES = {
     "base": ("nome da base", "base"),
     "delivered_qty": ("quantidade entregue com assinatura",),
 }
-DELIVERY_REQUIRED_KEYS = {"data", "filial", "rm", "delivered_qty"}
+DELIVERY_REQUIRED_KEYS = {"data", "filial", "rm", "base", "delivered_qty"}
 
 
 def resolve_columns(headers, aliases, required):
@@ -534,6 +534,134 @@ def compute_rm_ranking(session, args, period_conditions):
     return rows, ref_date, previous_date
 
 
+
+def compute_base_ranking(session, args, period_conditions):
+    """Ranking equivalente ao de RM, mas usando Base/Franquia como unidade de análise."""
+    ref_date = parse_date(args.get("end_date"))
+    if not ref_date:
+        ref_date = session.scalar(select(func.max(PNRRecord.data)).where(*period_conditions))
+    previous_date = ref_date - timedelta(days=1) if ref_date else None
+    non_date_conditions = build_pnr_conditions(args, include_dates=False)
+
+    stmt = (
+        select(
+            PNRRecord.base,
+            func.min(PNRRecord.station).label("station"),
+            func.count(PNRRecord.id).label("total"),
+            func.sum(PNRRecord.merchandise_value).label("merchandise_value"),
+        )
+        .where(*period_conditions)
+        .group_by(PNRRecord.base)
+    )
+
+    def complaint_totals(day_value):
+        if not day_value:
+            return {}
+        rows = session.execute(
+            select(PNRRecord.base, func.count(PNRRecord.id))
+            .where(*non_date_conditions, PNRRecord.data == day_value)
+            .group_by(PNRRecord.base)
+        )
+        out = {}
+        for base_name, count in rows:
+            key = join_key(base_name)
+            out[key] = out.get(key, 0) + int(count or 0)
+        return out
+
+    def delivery_totals(day_value):
+        if not day_value:
+            return {}
+        rows = session.execute(
+            select(DeliveryRecord.base, func.sum(DeliveryRecord.delivered_qty))
+            .where(*build_delivery_conditions(args, include_dates=False), DeliveryRecord.data == day_value)
+            .group_by(DeliveryRecord.base)
+        )
+        out = {}
+        for base_name, qty in rows:
+            key = join_key(base_name)
+            if not key:
+                continue
+            out[key] = out.get(key, 0.0) + float(qty or 0)
+        return out
+
+    current_complaints = complaint_totals(ref_date)
+    previous_complaints = complaint_totals(previous_date)
+    current_deliveries = delivery_totals(ref_date)
+    previous_deliveries = delivery_totals(previous_date)
+
+    rows = []
+    for base_name, station, cnt, value_total in session.execute(stmt):
+        display_base = base_name or "Não informado"
+        key = join_key(display_base)
+        cur_c = current_complaints.get(key, 0)
+        prev_c = previous_complaints.get(key, 0)
+        cur_d = current_deliveries.get(key, 0.0)
+        prev_d = previous_deliveries.get(key, 0.0)
+        current_rate = safe_rate(cur_c, cur_d)
+        previous_rate = safe_rate(prev_c, prev_d)
+        variation = round(current_rate - previous_rate, 2) if current_rate is not None and previous_rate is not None else None
+        rows.append({
+            "base": display_base,
+            "base_key": key,
+            "station": station or normalize_station("", display_base),
+            "count": int(cnt or 0),
+            "merchandise_value": round(float(value_total or 0), 2),
+            "rate": current_rate,
+            "previous_rate": previous_rate,
+            "variation": variation,
+            "current_complaints": cur_c,
+            "current_deliveries": round(cur_d, 2),
+            "previous_complaints": prev_c,
+            "previous_deliveries": round(prev_d, 2),
+        })
+    rows.sort(key=lambda r: (r["rate"] is not None, r["rate"] if r["rate"] is not None else -1, r["count"]), reverse=True)
+    return rows, ref_date, previous_date
+
+
+def compute_base_dashboard(session, args):
+    conditions = build_pnr_conditions(args)
+    total = int(session.scalar(select(func.count(PNRRecord.id)).where(*conditions)) or 0)
+    own = int(session.scalar(select(func.count(PNRRecord.id)).where(*conditions, PNRRecord.station == "Própria")) or 0)
+    franchise = int(session.scalar(select(func.count(PNRRecord.id)).where(*conditions, PNRRecord.station == "Franquia")) or 0)
+    bases_count = int(session.scalar(select(func.count(func.distinct(PNRRecord.base))).where(*conditions)) or 0)
+    drivers_count = int(session.scalar(select(func.count(func.distinct(PNRRecord.driver))).where(*conditions)) or 0)
+
+    base_rows, ref_date, previous_date = compute_base_ranking(session, args, conditions)
+
+    station_rows = []
+    for station_name in ("Própria", "Franquia"):
+        station_conditions = conditions + [PNRRecord.station == station_name]
+        cnt = int(session.scalar(select(func.count(PNRRecord.id)).where(*station_conditions)) or 0)
+        base_cnt = int(session.scalar(select(func.count(func.distinct(PNRRecord.base))).where(*station_conditions)) or 0)
+        top = grouped_counts(session, PNRRecord.base, station_conditions, 1)
+        station_rows.append({
+            "station": station_name,
+            "count": cnt,
+            "share": round(cnt / total * 100, 1) if total else 0,
+            "bases": base_cnt,
+            "top_base": top[0]["label"] if top else "—",
+        })
+
+    daily_stmt = (
+        select(PNRRecord.data, func.count(PNRRecord.id))
+        .where(*conditions)
+        .group_by(PNRRecord.data)
+        .order_by(PNRRecord.data.asc())
+    )
+    daily = [{"date": d.isoformat(), "count": int(c)} for d, c in session.execute(daily_stmt)]
+
+    return {
+        "kpis": {"total": total, "own": own, "franchise": franchise, "bases": bases_count, "drivers": drivers_count},
+        "base_ranking": base_rows,
+        "station_summary": station_rows,
+        "top_bases": grouped_counts(session, PNRRecord.base, conditions, 10),
+        "top_drivers": grouped_counts(session, PNRRecord.driver, conditions, 10),
+        "top_origins": grouped_counts(session, PNRRecord.order_source, conditions, 10),
+        "daily": daily,
+        "rate_reference_date": ref_date.isoformat() if ref_date else None,
+        "rate_previous_date": previous_date.isoformat() if previous_date else None,
+    }
+
 def compute_dashboard(session, args):
     conditions = build_pnr_conditions(args)
     total = int(session.scalar(select(func.count(PNRRecord.id)).where(*conditions)) or 0)
@@ -635,6 +763,12 @@ def filters():
 def dashboard_data():
     with SessionLocal() as session:
         return jsonify(compute_dashboard(session, request.args))
+
+
+@app.get("/api/dashboard-bases")
+def dashboard_bases_data():
+    with SessionLocal() as session:
+        return jsonify(compute_base_dashboard(session, request.args))
 
 
 @app.get("/api/charts")
@@ -755,8 +889,9 @@ def append_write_sheet(wb, title, headers, rows):
 @app.get("/api/export")
 def export_tables():
     lang = clean_text(request.args.get("lang")) or "pt-BR"
+    mode = clean_text(request.args.get("mode"))
     with SessionLocal() as session:
-        dashboard = compute_dashboard(session, request.args)
+        dashboard = compute_base_dashboard(session, request.args) if mode == "bases" else compute_dashboard(session, request.args)
         conditions = build_pnr_conditions(request.args)
         meta = session.get(AppMeta, 1)
         try:
@@ -767,11 +902,18 @@ def export_tables():
             raw_headers = ["Data", "Filial", "Número do ticket", "Origem do Pedido", "Base", "Motorista", "RM", "Supervisor", "Estação", "Atendimento", "Motivo N1", "Motivo N2", "Valor da mercadoria"]
 
         wb = Workbook(write_only=True)
-        rm_headers = ["排名", "RM", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
-        rm_rows = []
-        for i, row in enumerate(dashboard["rm_ranking"], 1):
-            rm_rows.append([i, row["rm"], row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
-        append_write_sheet(wb, "RM排名" if lang == "zh-CN" else "Ranking RM", rm_headers, rm_rows)
+        if mode == "bases":
+            base_headers = ["排名", "网点", "网点类型", "PNR", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "Base", "Tipo de estação", "PNR", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
+            base_rows = []
+            for i, row in enumerate(dashboard["base_ranking"], 1):
+                base_rows.append([i, row["base"], row["station"], row["count"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
+            append_write_sheet(wb, "网点排名" if lang == "zh-CN" else "Ranking Bases", base_headers, base_rows)
+        else:
+            rm_headers = ["排名", "RM", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
+            rm_rows = []
+            for i, row in enumerate(dashboard["rm_ranking"], 1):
+                rm_rows.append([i, row["rm"], row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
+            append_write_sheet(wb, "RM排名" if lang == "zh-CN" else "Ranking RM", rm_headers, rm_rows)
 
         station_headers = ["网点类型", "PNR", "占比", "网点数量", "主要网点"] if lang == "zh-CN" else ["Tipo de estação", "PNR", "Participação", "Bases", "Top base"]
         station_rows = [[r["station"], r["count"], r["share"] / 100, r["bases"], r["top_base"]] for r in dashboard["station_summary"]]

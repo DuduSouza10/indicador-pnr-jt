@@ -520,3 +520,86 @@ footer { color: #8b9097; }
   .legend-item { width: 100%; }
   .dual-upload-grid .drop-zone { min-height: 130px; }
 }
+
+/* ===== v4: Dashboard de Bases/Franquias + Sparkline legível por RM ===== */
+.base-rate-table { min-width: 920px; }
+.bases-filter-grid { align-items: end; }
+
+/* O gráfico usa uma faixa independente por RM para evitar pontos/rótulos sobrepostos. */
+.line-chart-layout { display: block; min-height: 0; }
+.rm-line-chart-wrap {
+  min-width: 0;
+  max-height: 760px;
+  overflow: auto;
+  border: 1px solid var(--line);
+  border-radius: 15px;
+  background: #fff;
+  scrollbar-color: #c9cdd3 transparent;
+}
+.rm-line-chart { min-height: 0; min-width: 100%; }
+.spark-matrix { min-width: 100%; width: max-content; }
+.spark-series-row,
+.spark-date-row {
+  display: flex;
+  align-items: stretch;
+  min-height: 132px;
+  border-bottom: 1px solid #edf0f2;
+  background: #fff;
+}
+.spark-series-row:nth-child(even) { background: #fbfcfd; }
+.spark-series-label {
+  position: sticky;
+  left: 0;
+  z-index: 4;
+  flex: 0 0 240px;
+  width: 240px;
+  min-width: 240px;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: 7px;
+  padding: 14px 18px;
+  border-right: 1px solid #e3e6ea;
+  background: rgba(255,255,255,.97);
+  box-shadow: 8px 0 14px rgba(31,38,49,.025);
+}
+.spark-series-row:nth-child(even) .spark-series-label { background: rgba(251,252,253,.98); }
+.spark-series-name { display: flex; align-items: flex-start; gap: 10px; min-width: 0; color: #25282d; font-size: 11px; line-height: 1.35; }
+.spark-series-name i { flex: 0 0 11px; width: 11px; height: 11px; margin-top: 2px; border-radius: 999px; box-shadow: 0 0 0 3px rgba(22,28,37,.04); }
+.spark-series-name strong { overflow-wrap: anywhere; }
+.spark-series-label small { color: #858b93; font-size: 9px; font-weight: 700; padding-left: 21px; }
+.spark-series-canvas { flex: 0 0 auto; min-width: 0; }
+.spark-series-canvas svg { display: block; font-family: inherit; overflow: visible; }
+.spark-row-grid { stroke: #eceff2; stroke-width: 1; }
+.spark-day-guide { stroke: #f1f3f5; stroke-width: 1; stroke-dasharray: 2 4; }
+.spark-point-label-bg { fill: rgba(255,255,255,.96); stroke: #e5e8ec; stroke-width: 1; }
+.spark-point-label { font-size: 9px; paint-order: stroke; stroke: #fff; stroke-width: 2px; stroke-linejoin: round; }
+.chart-point circle { transition: r .14s ease, filter .14s ease; }
+.chart-point:hover circle { r: 8.5px; filter: drop-shadow(0 2px 4px rgba(0,0,0,.12)); }
+.chart-point:hover .spark-point-label-bg { stroke: #cdd2d8; }
+.spark-date-row {
+  position: sticky;
+  bottom: 0;
+  z-index: 6;
+  min-height: 58px;
+  height: 58px;
+  background: #f7f8fa;
+  border-bottom: 0;
+  border-top: 1px solid #dfe3e8;
+}
+.spark-date-row .spark-series-label { min-height: 58px; height: 58px; background: #f7f8fa; color: #686e76; font-size: 10px; font-weight: 850; text-transform: uppercase; letter-spacing: .08em; }
+.spark-date-canvas { height: 58px; background: #f7f8fa; }
+.spark-axis-tick { stroke: #bfc5cc; stroke-width: 1; }
+.spark-date-label { fill: #666c74; font-size: 9px; font-weight: 750; }
+
+@media (max-width: 880px) {
+  .line-chart-layout { display: block; }
+  .spark-series-label { flex-basis: 190px; width: 190px; min-width: 190px; padding: 12px; }
+  .spark-series-label small { padding-left: 0; }
+}
+@media (max-width: 620px) {
+  .spark-series-label { flex-basis: 155px; width: 155px; min-width: 155px; }
+  .spark-series-name { font-size: 10px; }
+  .view-tabs { flex-wrap: wrap; }
+  .view-tab { flex: 1 1 calc(50% - 6px); }
+}
