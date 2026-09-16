@@ -92,26 +92,26 @@
         <button class="ghost-btn compact-btn" id="clearClickFiltersBtn" type="button" data-i18n="clearClickFilters">Limpar seleção</button>
       </div>
 
-      <section class="grid-2 ranking-grid">
+      <section class="ranking-full-row">
         <article class="panel data-panel rm-ranking-panel">
           <div class="panel-head">
             <div><span class="section-kicker" data-i18n="management">GESTÃO</span><h2 data-i18n="rmRanking">Ranking por RM</h2></div>
             <div class="ranking-context"><span class="context-pill" id="rmCountBadge">0 RMs</span><span class="context-pill rate-date" id="rateDateBadge">—</span></div>
           </div>
           <div class="table-scroll"><table class="data-table rm-rate-table"><thead><tr>
-            <th>#</th><th>RM</th><th data-i18n="base">Base</th><th data-i18n="supervisor">Supervisor</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
+            <th>#</th><th>RM</th><th data-i18n="base">Base</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
           </tr></thead><tbody id="rmTableBody"></tbody></table></div>
         </article>
+      </section>
 
-        <article class="panel data-panel">
-          <div class="panel-head"><div><span class="section-kicker" data-i18n="distribution">DISTRIBUIÇÃO</span><h2 data-i18n="ownVsFranchise">Base própria x franquia</h2></div><span class="context-pill" data-i18n="stationType">TIPO DE ESTAÇÃO</span></div>
-          <div class="table-scroll station-table-wrap">
-            <table class="data-table station-summary-table">
-              <thead><tr><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="share">Participação</th><th class="num" data-i18n="bases">Bases</th><th data-i18n="topBase">Top base</th></tr></thead>
-              <tbody id="stationTableBody"></tbody>
-            </table>
-          </div>
-        </article>
+      <section class="panel data-panel distribution-panel">
+        <div class="panel-head"><div><span class="section-kicker" data-i18n="distribution">DISTRIBUIÇÃO</span><h2 data-i18n="ownVsFranchise">Base própria x franquia</h2></div><span class="context-pill" data-i18n="stationType">TIPO DE ESTAÇÃO</span></div>
+        <div class="table-scroll station-table-wrap">
+          <table class="data-table station-summary-table">
+            <thead><tr><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="share">Participação</th><th class="num" data-i18n="bases">Bases</th><th data-i18n="topBase">Top base</th></tr></thead>
+            <tbody id="stationTableBody"></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="grid-3">
@@ -168,26 +168,26 @@
         <button class="ghost-btn compact-btn" id="baseClearClickFiltersBtn" type="button" data-i18n="clearClickFilters">Limpar seleção</button>
       </div>
 
-      <section class="grid-2 ranking-grid">
+      <section class="ranking-full-row">
         <article class="panel data-panel rm-ranking-panel">
           <div class="panel-head">
             <div><span class="section-kicker" data-i18n="management">GESTÃO</span><h2 data-i18n="baseRanking">Ranking por Base / Franquia</h2></div>
             <div class="ranking-context"><span class="context-pill" id="baseCountBadge">0 Bases</span><span class="context-pill rate-date" id="baseRateDateBadge">—</span></div>
           </div>
           <div class="table-scroll"><table class="data-table base-rate-table"><thead><tr>
-            <th>#</th><th data-i18n="base">Base</th><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
+            <th>#</th><th data-i18n="base">Base</th><th data-i18n="supervisor">Supervisor</th><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
           </tr></thead><tbody id="baseRankingTableBody"></tbody></table></div>
         </article>
+      </section>
 
-        <article class="panel data-panel">
-          <div class="panel-head"><div><span class="section-kicker" data-i18n="distribution">DISTRIBUIÇÃO</span><h2 data-i18n="ownVsFranchise">Base própria x franquia</h2></div><span class="context-pill" data-i18n="stationType">TIPO DE ESTAÇÃO</span></div>
-          <div class="table-scroll station-table-wrap">
-            <table class="data-table station-summary-table">
-              <thead><tr><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="share">Participação</th><th class="num" data-i18n="bases">Bases</th><th data-i18n="topBase">Top base</th></tr></thead>
-              <tbody id="baseStationTableBody"></tbody>
-            </table>
-          </div>
-        </article>
+      <section class="panel data-panel distribution-panel">
+        <div class="panel-head"><div><span class="section-kicker" data-i18n="distribution">DISTRIBUIÇÃO</span><h2 data-i18n="ownVsFranchise">Base própria x franquia</h2></div><span class="context-pill" data-i18n="stationType">TIPO DE ESTAÇÃO</span></div>
+        <div class="table-scroll station-table-wrap">
+          <table class="data-table station-summary-table">
+            <thead><tr><th data-i18n="stationType">Tipo de estação</th><th class="num">PNR</th><th class="num" data-i18n="share">Participação</th><th class="num" data-i18n="bases">Bases</th><th data-i18n="topBase">Top base</th></tr></thead>
+            <tbody id="baseStationTableBody"></tbody>
+          </table>
+        </div>
       </section>
 
       <section class="grid-3">

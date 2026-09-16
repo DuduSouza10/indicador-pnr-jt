@@ -259,14 +259,14 @@ function renderDashboard(data) {
 
 function renderRmTable(rows) {
   const body = $('rmTableBody'); body.innerHTML = '';
-  if (!rows.length) { body.innerHTML = `<tr><td colspan="10" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`; return; }
+  if (!rows.length) { body.innerHTML = `<tr><td colspan="9" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`; return; }
   rows.forEach((row, i) => {
     const tr = document.createElement('tr'); tr.className = 'click-row'; tr.tabIndex = 0;
     const variation = row.variation;
     const vClass = variation === null ? 'neutral' : variation > 0 ? 'up' : variation < 0 ? 'down' : 'neutral';
     const vText = variation === null ? '—' : `${variation > 0 ? '+' : ''}${formatRate(variation)}`;
     const rateText = row.rate === null ? `<span class="no-rate">${escapeHtml(t('noDelivery'))}</span>` : `<strong>${formatRate(row.rate)}</strong><small>${escapeHtml(t('previousRate', {value: formatRate(row.previous_rate)}))}</small>`;
-    tr.innerHTML = `<td><span class="rank-number ${i<3?'top':''}">${i+1}</span></td><td><strong>${escapeHtml(row.rm)}</strong></td><td>${escapeHtml(row.base || '—')}</td><td>${escapeHtml(row.supervisor || '—')}</td><td class="num">${formatNum(row.count)}</td><td class="num">${formatNum(row.own)}</td><td class="num">${formatNum(row.franchise)}</td><td class="num money-cell">${formatCurrency(row.merchandise_value)}</td><td class="num rate-cell">${rateText}</td><td class="num"><span class="variation-pill ${vClass}">${vText}</span></td>`;
+    tr.innerHTML = `<td><span class="rank-number ${i<3?'top':''}">${i+1}</span></td><td><strong>${escapeHtml(row.rm)}</strong></td><td>${escapeHtml(row.base || '—')}</td><td class="num">${formatNum(row.count)}</td><td class="num">${formatNum(row.own)}</td><td class="num">${formatNum(row.franchise)}</td><td class="num money-cell">${formatCurrency(row.merchandise_value)}</td><td class="num rate-cell">${rateText}</td><td class="num"><span class="variation-pill ${vClass}">${vText}</span></td>`;
     const apply = async () => { $('rmFilter').value = row.rm; await loadDashboard(); };
     tr.addEventListener('click', apply); tr.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();apply();} }); body.appendChild(tr);
   });
@@ -346,13 +346,13 @@ function renderBaseDashboard(data) {
 
 function renderBaseRankingTable(rows) {
   const body=$('baseRankingTableBody'); body.innerHTML='';
-  if(!rows.length){body.innerHTML=`<tr><td colspan="7" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`;return;}
+  if(!rows.length){body.innerHTML=`<tr><td colspan="8" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`;return;}
   rows.forEach((row,i)=>{
     const tr=document.createElement('tr'); tr.className='click-row'; tr.tabIndex=0;
     const variation=row.variation; const vClass=variation===null?'neutral':variation>0?'up':variation<0?'down':'neutral';
     const vText=variation===null?'—':`${variation>0?'+':''}${formatRate(variation)}`;
     const rateText=row.rate===null?`<span class="no-rate">${escapeHtml(t('noDelivery'))}</span>`:`<strong>${formatRate(row.rate)}</strong><small>${escapeHtml(t('previousRate',{value:formatRate(row.previous_rate)}))}</small>`;
-    tr.innerHTML=`<td><span class="rank-number ${i<3?'top':''}">${i+1}</span></td><td><strong>${escapeHtml(row.base)}</strong></td><td><span class="station-type-cell"><i class="station-dot ${row.station==='Franquia'?'muted':''}"></i>${escapeHtml(translateKnownValue(row.station))}</span></td><td class="num">${formatNum(row.count)}</td><td class="num money-cell">${formatCurrency(row.merchandise_value)}</td><td class="num rate-cell">${rateText}</td><td class="num"><span class="variation-pill ${vClass}">${vText}</span></td>`;
+    tr.innerHTML=`<td><span class="rank-number ${i<3?'top':''}">${i+1}</span></td><td><strong>${escapeHtml(row.base)}</strong></td><td>${escapeHtml(row.supervisor || '—')}</td><td><span class="station-type-cell"><i class="station-dot ${row.station==='Franquia'?'muted':''}"></i>${escapeHtml(translateKnownValue(row.station))}</span></td><td class="num">${formatNum(row.count)}</td><td class="num money-cell">${formatCurrency(row.merchandise_value)}</td><td class="num rate-cell">${rateText}</td><td class="num"><span class="variation-pill ${vClass}">${vText}</span></td>`;
     const apply=async()=>{$('baseBaseFilter').value=row.base;await loadBaseDashboard();};
     tr.addEventListener('click',apply);tr.addEventListener('keydown',e=>{if(e.key==='Enter'||e.key===' '){e.preventDefault();apply();}});body.appendChild(tr);
   });

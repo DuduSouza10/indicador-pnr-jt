@@ -620,3 +620,15 @@ footer { color: #8b9097; }
 .rm-rate-table { min-width: 1080px; }
 @media (max-width: 880px) { .regional-rate-card { align-items: flex-start; flex-direction: column; } .regional-rate-copy { flex-basis: auto; } .regional-rate-metrics { width: 100%; justify-content: flex-start; } }
 @media (max-width: 620px) { .regional-rate-item { flex: 1 1 100%; min-width: 0; } }
+
+
+/* ===== PNR v6: ranking full width e distribuição reposicionada ===== */
+.ranking-full-row { display: block; margin-top: 16px; }
+.ranking-full-row > .data-panel { width: 100%; }
+.distribution-panel { margin-top: 16px; }
+.distribution-panel .station-table-wrap { overflow-x: auto; }
+.distribution-panel .station-summary-table { min-width: 680px; width: 100%; }
+.rm-rate-table { min-width: 900px; }
+.base-rate-table { min-width: 900px; }
+
+.global-regional-rate-wrap, .global-regional-rate-wrap .regional-rate-card { width: 100%; }

@@ -547,27 +547,23 @@ def compute_rm_ranking(session, args, period_conditions):
         .group_by(PNRRecord.rm_key)
     )
 
-    # Base e supervisor exibidos no ranking: usa a combinacao mais recorrente
-    # dentro do recorte para representar cada RM sem quebrar o ranking em varias linhas.
-    dominant_pair = {}
+    # Base exibida no ranking: usa a base mais recorrente dentro do recorte
+    # para representar cada RM sem quebrar o ranking em varias linhas.
+    dominant_base = {}
     detail_stmt = (
         select(
             PNRRecord.rm_key,
             PNRRecord.base,
-            PNRRecord.supervisor,
             func.count(PNRRecord.id).label("cnt"),
         )
         .where(*period_conditions)
-        .group_by(PNRRecord.rm_key, PNRRecord.base, PNRRecord.supervisor)
+        .group_by(PNRRecord.rm_key, PNRRecord.base)
         .order_by(PNRRecord.rm_key.asc(), func.count(PNRRecord.id).desc(), PNRRecord.base.asc())
     )
-    for detail_rm_key, base_name, supervisor_name, _ in session.execute(detail_stmt):
+    for detail_rm_key, base_name, _ in session.execute(detail_stmt):
         key = detail_rm_key or ""
-        if key not in dominant_pair:
-            dominant_pair[key] = (
-                normalize_value(base_name, "Sem base"),
-                normalize_value(supervisor_name),
-            )
+        if key not in dominant_base:
+            dominant_base[key] = normalize_value(base_name, "Sem base")
 
     rows = []
     for rm_key_value, rm, cnt, own_cnt, fran_cnt, value_total in session.execute(stmt):
@@ -599,12 +595,11 @@ def compute_rm_ranking(session, args, period_conditions):
         current_rate = safe_rate(current_complaints, current_deliveries)
         previous_rate = safe_rate(previous_complaints, previous_deliveries)
         variation = round(current_rate - previous_rate, 2) if current_rate is not None and previous_rate is not None else None
-        dominant_base, dominant_supervisor = dominant_pair.get(rm_key_value, ("Sem base", "Não informado"))
+        base_display = dominant_base.get(rm_key_value, "Sem base")
         rows.append({
             "rm": rm or "Não informado",
             "rm_key": rm_key_value,
-            "base": dominant_base,
-            "supervisor": dominant_supervisor,
+            "base": base_display,
             "count": int(cnt or 0),
             "own": int(own_cnt or 0),
             "franchise": int(fran_cnt or 0),
@@ -671,6 +666,22 @@ def compute_base_ranking(session, args, period_conditions):
             out[key] = out.get(key, 0.0) + float(qty or 0)
         return out
 
+    # Supervisor exibido no ranking por base: usa o supervisor mais recorrente
+    # daquela base dentro do recorte filtrado.
+    supervisor_counts = {}
+    supervisor_stmt = (
+        select(PNRRecord.base, PNRRecord.supervisor, func.count(PNRRecord.id))
+        .where(*period_conditions)
+        .group_by(PNRRecord.base, PNRRecord.supervisor)
+    )
+    for base_name, supervisor_name, sup_count in session.execute(supervisor_stmt):
+        key = join_key(base_name)
+        if not key:
+            continue
+        candidate = (int(sup_count or 0), normalize_value(supervisor_name) or "Não informado")
+        if key not in supervisor_counts or candidate[0] > supervisor_counts[key][0]:
+            supervisor_counts[key] = candidate
+
     current_complaints = complaint_totals(ref_date)
     previous_complaints = complaint_totals(previous_date)
     current_deliveries = delivery_totals(ref_date)
@@ -690,6 +701,7 @@ def compute_base_ranking(session, args, period_conditions):
         rows.append({
             "base": display_base,
             "base_key": key,
+            "supervisor": supervisor_counts.get(key, (0, "Não informado"))[1],
             "station": station or normalize_station("", display_base),
             "count": int(cnt or 0),
             "merchandise_value": round(float(value_total or 0), 2),
@@ -996,16 +1008,16 @@ def export_tables():
 
         wb = Workbook(write_only=True)
         if mode == "bases":
-            base_headers = ["排名", "网点", "网点类型", "PNR", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "Base", "Tipo de estação", "PNR", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
+            base_headers = ["排名", "网点", "主管", "网点类型", "PNR", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "Base", "Supervisor", "Tipo de estação", "PNR", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
             base_rows = []
             for i, row in enumerate(dashboard["base_ranking"], 1):
-                base_rows.append([i, row["base"], row["station"], row["count"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
+                base_rows.append([i, row["base"], row.get("supervisor"), row["station"], row["count"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
             append_write_sheet(wb, "网点排名" if lang == "zh-CN" else "Ranking Bases", base_headers, base_rows)
         else:
-            rm_headers = ["排名", "RM", "网点", "主管", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "Base", "Supervisor", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
+            rm_headers = ["排名", "RM", "网点", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "Base", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
             rm_rows = []
             for i, row in enumerate(dashboard["rm_ranking"], 1):
-                rm_rows.append([i, row["rm"], row.get("base"), row.get("supervisor"), row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
+                rm_rows.append([i, row["rm"], row.get("base"), row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
             append_write_sheet(wb, "RM排名" if lang == "zh-CN" else "Ranking RM", rm_headers, rm_rows)
 
         station_headers = ["网点类型", "PNR", "占比", "网点数量", "主要网点"] if lang == "zh-CN" else ["Tipo de estação", "PNR", "Participação", "Bases", "Top base"]

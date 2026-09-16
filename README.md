@@ -61,3 +61,9 @@ python app.py
 - Card global **Taxa PNR por Regional** em todas as abas, calculado por periodo como `Reclamacoes / Entregas x 10.000`.
 - Ranking por RM agora exibe **Base** e **Supervisor** antes das metricas. A base/supervisor representam a combinacao mais recorrente daquele RM no recorte.
 - A exportacao do Ranking RM tambem inclui Base e Supervisor.
+
+### Ajuste v6
+- Ranking por RM voltou a ficar sem a coluna Supervisor.
+- Ranking por Base/Franquia agora exibe Supervisor logo após Base.
+- Os rankings ocupam toda a largura da página.
+- A distribuição Base Própria x Franquia foi movida para um painel separado abaixo do ranking.
