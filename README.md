@@ -67,3 +67,8 @@ python app.py
 - Ranking por Base/Franquia agora exibe Supervisor logo após Base.
 - Os rankings ocupam toda a largura da página.
 - A distribuição Base Própria x Franquia foi movida para um painel separado abaixo do ranking.
+
+## v7 - Classificação por quantidade
+- Ranking por RM agora é ordenado pela quantidade total de reclamações no período, do maior para o menor.
+- Ranking por Base/Franquia também é ordenado pela quantidade total de reclamações no período, do maior para o menor.
+- Taxa PNR e variação D-1 continuam exibidas como métricas, mas não definem mais a posição no ranking.

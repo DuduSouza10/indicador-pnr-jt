@@ -612,7 +612,7 @@ def compute_rm_ranking(session, args, period_conditions):
             "previous_complaints": previous_complaints,
             "previous_deliveries": round(previous_deliveries, 2),
         })
-    rows.sort(key=lambda r: (r["rate"] is not None, r["rate"] if r["rate"] is not None else -1, r["count"]), reverse=True)
+    rows.sort(key=lambda r: (r["count"], r["rate"] if r["rate"] is not None else -1), reverse=True)
     return rows, ref_date, previous_date
 
 
@@ -713,7 +713,7 @@ def compute_base_ranking(session, args, period_conditions):
             "previous_complaints": prev_c,
             "previous_deliveries": round(prev_d, 2),
         })
-    rows.sort(key=lambda r: (r["rate"] is not None, r["rate"] if r["rate"] is not None else -1, r["count"]), reverse=True)
+    rows.sort(key=lambda r: (r["count"], r["rate"] if r["rate"] is not None else -1), reverse=True)
     return rows, ref_date, previous_date
 
 
