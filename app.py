@@ -465,6 +465,68 @@ def safe_rate(complaints, deliveries):
     return round(float(complaints or 0) / deliveries * 10000, 2)
 
 
+def compute_regional_rates(session, args):
+    """Taxa PNR por regional no periodo: reclamacoes / entregas x 10.000.
+
+    O card regional usa apenas o recorte de datas da pagina ativa para manter
+    comparabilidade entre MG, SPN e eventuais novas regionais.
+    """
+    start_date = parse_date(args.get("start_date"))
+    end_date = parse_date(args.get("end_date"))
+
+    if not start_date:
+        start_date = session.scalar(select(func.min(PNRRecord.data)))
+    if not end_date:
+        end_date = session.scalar(select(func.max(PNRRecord.data)))
+    if start_date and end_date and start_date > end_date:
+        start_date, end_date = end_date, start_date
+
+    pnr_conditions = []
+    delivery_conditions = []
+    if start_date:
+        pnr_conditions.append(PNRRecord.data >= start_date)
+        delivery_conditions.append(DeliveryRecord.data >= start_date)
+    if end_date:
+        pnr_conditions.append(PNRRecord.data <= end_date)
+        delivery_conditions.append(DeliveryRecord.data <= end_date)
+
+    complaint_rows = session.execute(
+        select(PNRRecord.filial, func.count(PNRRecord.id))
+        .where(*pnr_conditions)
+        .group_by(PNRRecord.filial)
+    )
+    delivery_rows = session.execute(
+        select(DeliveryRecord.filial, func.sum(DeliveryRecord.delivered_qty))
+        .where(*delivery_conditions)
+        .group_by(DeliveryRecord.filial)
+    )
+
+    complaints = {normalize_value(regional): int(total or 0) for regional, total in complaint_rows}
+    deliveries = {normalize_value(regional): float(total or 0) for regional, total in delivery_rows}
+    names = set(complaints) | set(deliveries)
+
+    def regional_sort_key(name):
+        upper = clean_text(name).upper()
+        preferred = {"MG": 0, "SPN": 1}
+        return (preferred.get(upper, 99), upper)
+
+    rows = []
+    for regional in sorted(names, key=regional_sort_key):
+        c = complaints.get(regional, 0)
+        d = deliveries.get(regional, 0.0)
+        rows.append({
+            "regional": regional,
+            "complaints": c,
+            "deliveries": round(d, 2),
+            "rate": safe_rate(c, d),
+        })
+    return {
+        "start_date": start_date.isoformat() if start_date else None,
+        "end_date": end_date.isoformat() if end_date else None,
+        "regional_rates": rows,
+    }
+
+
 def compute_rm_ranking(session, args, period_conditions):
     ref_date = parse_date(args.get("end_date"))
     if not ref_date:
@@ -484,6 +546,28 @@ def compute_rm_ranking(session, args, period_conditions):
         .where(*period_conditions)
         .group_by(PNRRecord.rm_key)
     )
+
+    # Base e supervisor exibidos no ranking: usa a combinacao mais recorrente
+    # dentro do recorte para representar cada RM sem quebrar o ranking em varias linhas.
+    dominant_pair = {}
+    detail_stmt = (
+        select(
+            PNRRecord.rm_key,
+            PNRRecord.base,
+            PNRRecord.supervisor,
+            func.count(PNRRecord.id).label("cnt"),
+        )
+        .where(*period_conditions)
+        .group_by(PNRRecord.rm_key, PNRRecord.base, PNRRecord.supervisor)
+        .order_by(PNRRecord.rm_key.asc(), func.count(PNRRecord.id).desc(), PNRRecord.base.asc())
+    )
+    for detail_rm_key, base_name, supervisor_name, _ in session.execute(detail_stmt):
+        key = detail_rm_key or ""
+        if key not in dominant_pair:
+            dominant_pair[key] = (
+                normalize_value(base_name, "Sem base"),
+                normalize_value(supervisor_name),
+            )
 
     rows = []
     for rm_key_value, rm, cnt, own_cnt, fran_cnt, value_total in session.execute(stmt):
@@ -515,9 +599,12 @@ def compute_rm_ranking(session, args, period_conditions):
         current_rate = safe_rate(current_complaints, current_deliveries)
         previous_rate = safe_rate(previous_complaints, previous_deliveries)
         variation = round(current_rate - previous_rate, 2) if current_rate is not None and previous_rate is not None else None
+        dominant_base, dominant_supervisor = dominant_pair.get(rm_key_value, ("Sem base", "Não informado"))
         rows.append({
             "rm": rm or "Não informado",
             "rm_key": rm_key_value,
+            "base": dominant_base,
+            "supervisor": dominant_supervisor,
             "count": int(cnt or 0),
             "own": int(own_cnt or 0),
             "franchise": int(fran_cnt or 0),
@@ -771,6 +858,12 @@ def dashboard_bases_data():
         return jsonify(compute_base_dashboard(session, request.args))
 
 
+@app.get("/api/regional-rates")
+def regional_rates_data():
+    with SessionLocal() as session:
+        return jsonify(compute_regional_rates(session, request.args))
+
+
 @app.get("/api/charts")
 def chart_data():
     with SessionLocal() as session:
@@ -909,10 +1002,10 @@ def export_tables():
                 base_rows.append([i, row["base"], row["station"], row["count"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
             append_write_sheet(wb, "网点排名" if lang == "zh-CN" else "Ranking Bases", base_headers, base_rows)
         else:
-            rm_headers = ["排名", "RM", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
+            rm_headers = ["排名", "RM", "网点", "主管", "PNR", "直营网点", "加盟网点", "货值", "PNR率", "前一日PNR率", "较前一日变化"] if lang == "zh-CN" else ["Ranking", "RM", "Base", "Supervisor", "PNR", "Base própria", "Franquia", "Valor da mercadoria", "Taxa PNR", "Taxa PNR D-1", "Variação D-1"]
             rm_rows = []
             for i, row in enumerate(dashboard["rm_ranking"], 1):
-                rm_rows.append([i, row["rm"], row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
+                rm_rows.append([i, row["rm"], row.get("base"), row.get("supervisor"), row["count"], row["own"], row["franchise"], row["merchandise_value"], row["rate"], row["previous_rate"], row["variation"]])
             append_write_sheet(wb, "RM排名" if lang == "zh-CN" else "Ranking RM", rm_headers, rm_rows)
 
         station_headers = ["网点类型", "PNR", "占比", "网点数量", "主要网点"] if lang == "zh-CN" else ["Tipo de estação", "PNR", "Participação", "Bases", "Top base"]

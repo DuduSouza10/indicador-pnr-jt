@@ -55,3 +55,9 @@ No Windows, execute `INICIAR_LOCAL.bat` ou:
 pip install -r requirements.txt
 python app.py
 ```
+
+
+## v5 - Taxa regional e supervisor no ranking
+- Card global **Taxa PNR por Regional** em todas as abas, calculado por periodo como `Reclamacoes / Entregas x 10.000`.
+- Ranking por RM agora exibe **Base** e **Supervisor** antes das metricas. A base/supervisor representam a combinacao mais recorrente daquele RM no recorte.
+- A exportacao do Ranking RM tambem inclui Base e Supervisor.

@@ -603,3 +603,20 @@ footer { color: #8b9097; }
   .view-tabs { flex-wrap: wrap; }
   .view-tab { flex: 1 1 calc(50% - 6px); }
 }
+
+
+/* ===== Card global: Taxa PNR por Regional ===== */
+.global-regional-rate-wrap { margin: 0 0 18px; }
+.regional-rate-card { min-height: 104px; display: flex; align-items: center; justify-content: space-between; gap: 24px; padding: 18px 22px; overflow: visible; }
+.regional-rate-card::after { display: none; }
+.regional-rate-copy { flex: 0 1 310px; min-width: 210px; }
+.regional-rate-copy .kpi-foot { margin-top: 8px; }
+.regional-rate-metrics { display: flex; align-items: stretch; justify-content: flex-end; gap: 10px; flex: 1 1 auto; min-width: 0; flex-wrap: wrap; }
+.regional-rate-item { min-width: 180px; padding: 11px 14px; border: 1px solid var(--line); border-radius: 13px; background: var(--panel-2); }
+.regional-rate-name { display: block; color: var(--muted); font-size: 10px; font-weight: 850; letter-spacing: .1em; text-transform: uppercase; }
+.regional-rate-item strong { display: block; margin-top: 4px; color: var(--text); font-size: 27px; line-height: 1; letter-spacing: -.045em; font-variant-numeric: tabular-nums; }
+.regional-rate-item small { display: block; margin-top: 6px; color: var(--muted-2); font-size: 9px; }
+.regional-rate-empty { color: var(--muted-2); font-size: 18px; }
+.rm-rate-table { min-width: 1080px; }
+@media (max-width: 880px) { .regional-rate-card { align-items: flex-start; flex-direction: column; } .regional-rate-copy { flex-basis: auto; } .regional-rate-metrics { width: 100%; justify-content: flex-start; } }
+@media (max-width: 620px) { .regional-rate-item { flex: 1 1 100%; min-width: 0; } }

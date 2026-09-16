@@ -13,6 +13,7 @@ const state = {
   lastDashboard: null,
   lastBaseDashboard: null,
   lastCharts: null,
+  regionalRates: null,
   watchTimer: null,
 };
 
@@ -25,7 +26,7 @@ const I18N = {
     dashboardGeneralTab: 'Dashboard Geral', dashboardBasesTab: 'Dashboard - Bases/Franquias', chartsTab: 'Gráficos', editorTab: 'Editar planilha', filters: 'FILTROS', globalCut: 'Recorte global', clearFilters: 'Limpar filtros', exportXlsx: 'Exportar XLSX', updateData: 'Atualizar dados',
     clickToFilter: 'Clique para filtrar os demais indicadores', clickFilter: 'Filtro por clique', clearClickFilters: 'Limpar seleção', withBase: 'Com base informada', withDriver: 'Com motorista informado',
     lastDay: 'Último dia', sevenDays: '7 dias', thirtyDays: '30 dias', allPeriod: 'Todo período', startDate: 'Data inicial', endDate: 'Data final', regional: 'Regional', supervisor: 'Supervisor', stationType: 'Tipo de estação', stationBase: 'Estação / Base', service: 'Atendimento', all: 'Todos',
-    pnrPeriod: 'PNR NO PERÍODO', totalTickets: 'Total de reclamações no recorte', ownBase: 'BASE PRÓPRIA', ownShort: 'Própria', franchise: 'Franquia', ofTotal: 'do total', basesInvolved: 'BASES ENVOLVIDAS', stationsWithPnr: 'Estações com PNR no período', drivers: 'MOTORISTAS', distinctDrivers: 'Motoristas distintos',
+    pnrPeriod: 'PNR NO PERÍODO', totalTickets: 'Total de reclamações no recorte', regionalPnrRate: 'TAXA PNR POR REGIONAL', regionalRateFormula: 'Reclamações ÷ Entregas × 10.000', regionalRatePeriod: 'Período {start} a {end}', complaintsShortPlural: 'reclamações', deliveriesShortPlural: 'entregas', ownBase: 'BASE PRÓPRIA', ownShort: 'Própria', franchise: 'Franquia', ofTotal: 'do total', basesInvolved: 'BASES ENVOLVIDAS', stationsWithPnr: 'Estações com PNR no período', drivers: 'MOTORISTAS', distinctDrivers: 'Motoristas distintos',
     management: 'GESTÃO', rmRanking: 'Ranking por RM', baseRanking: 'Ranking por Base / Franquia', baseGlobalCut: 'Recorte por bases e franquias', baseCount: '{n} Bases', distribution: 'DISTRIBUIÇÃO', ownVsFranchise: 'Base própria x franquia', share: 'Participação', bases: 'Bases', topBase: 'Top base', merchandiseValue: 'Valor da mercadoria', pnrRate: 'Taxa PNR', variationD1: 'Variação D-1',
     topBases: 'Bases mais ofensoras', topDrivers: 'Motoristas ofensores', topOrigins: 'Origem do pedido', evolution: 'EVOLUÇÃO', pnrPerDay: 'PNR por dia', rateOn: 'Taxa em {date}', previousRate: 'D-1 {value}', noDelivery: 'Sem entregas',
     chartsAnalysis: 'ANÁLISE GRÁFICA', pnrRateEvolution: 'Evolução da Taxa de PNR', rmsFilter: "RM's", totalComplaints: 'RECLAMAÇÕES', selectedPeriod: 'No período selecionado', sumMerchandise: 'Soma das mercadorias reclamadas', franchiseComplaints: 'Reclamações em franquias', ownComplaints: 'Reclamações em bases próprias', sparklineModel: 'MODELO SPARKLINE', dailyRateByRm: 'Taxa diária de PNR por RM', rateFormula: 'Reclamações ÷ Entregas × 10.000', allRms: 'Todos os RMs', complaintsShort: 'recl.', deliveriesShort: 'entregas',
@@ -47,7 +48,7 @@ const I18N = {
     dashboardGeneralTab: '综合仪表盘', dashboardBasesTab: '网点 / 加盟网点仪表盘', chartsTab: '图表', editorTab: '编辑表格', filters: '筛选', globalCut: '全局筛选', clearFilters: '清除筛选', exportXlsx: '导出 XLSX', updateData: '更新数据',
     clickToFilter: '点击后联动筛选其他指标', clickFilter: '点击筛选', clearClickFilters: '清除选择', withBase: '已填写网点', withDriver: '已填写司机',
     lastDay: '最近一天', sevenDays: '7 天', thirtyDays: '30 天', allPeriod: '全部周期', startDate: '开始日期', endDate: '结束日期', regional: '区域', supervisor: '主管', stationType: '网点类型', stationBase: '网点 / 基地', service: '处理类型', all: '全部',
-    pnrPeriod: '周期内 PNR', totalTickets: '当前筛选范围内的投诉总数', ownBase: '直营网点', ownShort: '直营网点', franchise: '加盟网点', ofTotal: '占总量', basesInvolved: '涉及网点', stationsWithPnr: '周期内出现 PNR 的网点', drivers: '司机', distinctDrivers: '不同司机数量',
+    pnrPeriod: '周期内 PNR', totalTickets: '当前筛选范围内的投诉总数', regionalPnrRate: '区域 PNR 率', regionalRateFormula: '投诉 ÷ 配送 × 10,000', regionalRatePeriod: '周期 {start} 至 {end}', complaintsShortPlural: '投诉', deliveriesShortPlural: '配送', ownBase: '直营网点', ownShort: '直营网点', franchise: '加盟网点', ofTotal: '占总量', basesInvolved: '涉及网点', stationsWithPnr: '周期内出现 PNR 的网点', drivers: '司机', distinctDrivers: '不同司机数量',
     management: '管理', rmRanking: 'RM 排名', baseRanking: '网点 / 加盟网点排名', baseGlobalCut: '按网点与加盟网点筛选', baseCount: '{n} 个网点', distribution: '分布', ownVsFranchise: '直营网点 vs 加盟网点', share: '占比', bases: '网点数', topBase: '主要网点', merchandiseValue: '货值', pnrRate: 'PNR 率', variationD1: '较前一日变化',
     topBases: 'PNR 最高的 10 个网点', topDrivers: 'PNR 最高的 10 名司机', topOrigins: '订单来源 TOP 10', evolution: '趋势', pnrPerDay: '每日 PNR', rateOn: '{date} 的费率', previousRate: '前一日 {value}', noDelivery: '无配送量',
     chartsAnalysis: '图表分析', pnrRateEvolution: 'PNR 率趋势', rmsFilter: 'RM', totalComplaints: '投诉量', selectedPeriod: '所选周期', sumMerchandise: '投诉货值合计', franchiseComplaints: '加盟网点投诉量', ownComplaints: '直营网点投诉量', sparklineModel: 'SPARKLINE 模式', dailyRateByRm: '各 RM 每日 PNR 率', rateFormula: '投诉量 ÷ 配送量 × 10,000', allRms: '全部 RM', complaintsShort: '投诉', deliveriesShort: '配送',
@@ -101,6 +102,7 @@ function applyTranslations() {
   if (state.lastDashboard) renderDashboard(state.lastDashboard);
   if (state.lastBaseDashboard) renderBaseDashboard(state.lastBaseDashboard);
   if (state.lastCharts) renderCharts(state.lastCharts);
+  if (state.regionalRates) renderRegionalRates(state.regionalRates);
   if (state.editor.loaded) refreshEditorLabels();
 }
 
@@ -179,6 +181,45 @@ async function loadMeta() {
   $('footerRows').textContent = t('rowsInBase', { n: formatNum(meta.row_count || 0), d: formatNum(meta.delivery_row_count || 0) });
 }
 
+function regionalRateDateParams() {
+  const p = new URLSearchParams();
+  let start = '', end = '';
+  if (state.activeView === 'bases') { start = $('baseStartDate')?.value || ''; end = $('baseEndDate')?.value || ''; }
+  else if (state.activeView === 'charts') { start = $('chartStartDate')?.value || ''; end = $('chartEndDate')?.value || ''; }
+  else if (state.activeView === 'editor') { start = $('editorStartDate')?.value || ''; end = $('editorEndDate')?.value || ''; }
+  else { start = $('startDate')?.value || ''; end = $('endDate')?.value || ''; }
+  if (start) p.set('start_date', start);
+  if (end) p.set('end_date', end);
+  return p.toString();
+}
+
+async function loadRegionalRates() {
+  try {
+    const payload = await api(`/api/regional-rates?${regionalRateDateParams()}`);
+    state.regionalRates = payload;
+    renderRegionalRates(payload);
+  } catch (_) {
+    $('regionalRateMetrics').innerHTML = '<span class="regional-rate-empty">—</span>';
+  }
+}
+
+function renderRegionalRates(payload) {
+  const root = $('regionalRateMetrics');
+  const rows = payload?.regional_rates || [];
+  root.innerHTML = '';
+  if (!rows.length) { root.innerHTML = '<span class="regional-rate-empty">—</span>'; return; }
+  rows.forEach(row => {
+    const item = document.createElement('div');
+    item.className = 'regional-rate-item';
+    const rate = row.rate === null || row.rate === undefined ? '—' : formatRate(row.rate);
+    item.innerHTML = `<span class="regional-rate-name">${escapeHtml(row.regional)}</span><strong>${rate}</strong><small>${formatNum(row.complaints)} ${escapeHtml(t('complaintsShortPlural'))} · ${formatNum(row.deliveries)} ${escapeHtml(t('deliveriesShortPlural'))}</small>`;
+    root.appendChild(item);
+  });
+  const start = payload.start_date ? formatDate(payload.start_date) : '—';
+  const end = payload.end_date ? formatDate(payload.end_date) : '—';
+  $('regionalRatePeriod').textContent = payload.start_date || payload.end_date ? t('regionalRatePeriod', {start, end}) : t('regionalRateFormula');
+}
+
 function queryString() {
   const params = new URLSearchParams();
   const pairs = [['start_date','startDate'],['end_date','endDate'],['regional','regionalFilter'],['supervisor','supervisorFilter'],['rm','rmFilter'],['station','stationFilter'],['base','baseFilter'],['atendimento','atendimentoFilter']];
@@ -197,6 +238,7 @@ async function loadDashboard() {
     const payload = await api(`/api/dashboard?${queryString()}`);
     state.lastDashboard = payload;
     renderDashboard(payload);
+    if (state.activeView === 'dashboard') await loadRegionalRates();
   } finally { state.dashboardLoading = false; }
 }
 
@@ -217,14 +259,14 @@ function renderDashboard(data) {
 
 function renderRmTable(rows) {
   const body = $('rmTableBody'); body.innerHTML = '';
-  if (!rows.length) { body.innerHTML = `<tr><td colspan="8" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`; return; }
+  if (!rows.length) { body.innerHTML = `<tr><td colspan="10" class="empty-state">${escapeHtml(t('noDataFilters'))}</td></tr>`; return; }
   rows.forEach((row, i) => {
     const tr = document.createElement('tr'); tr.className = 'click-row'; tr.tabIndex = 0;
     const variation = row.variation;
     const vClass = variation === null ? 'neutral' : variation > 0 ? 'up' : variation < 0 ? 'down' : 'neutral';
     const vText = variation === null ? '—' : `${variation > 0 ? '+' : ''}${formatRate(variation)}`;
     const rateText = row.rate === null ? `<span class="no-rate">${escapeHtml(t('noDelivery'))}</span>` : `<strong>${formatRate(row.rate)}</strong><small>${escapeHtml(t('previousRate', {value: formatRate(row.previous_rate)}))}</small>`;
-    tr.innerHTML = `<td><span class="rank-number ${i<3?'top':''}">${i+1}</span></td><td><strong>${escapeHtml(row.rm)}</strong></td><td class="num">${formatNum(row.count)}</td><td class="num">${formatNum(row.own)}</td><td class="num">${formatNum(row.franchise)}</td><td class="num money-cell">${formatCurrency(row.merchandise_value)}</td><td class="num rate-cell">${rateText}</td><td class="num"><span class="variation-pill ${vClass}">${vText}</span></td>`;
+    tr.innerHTML = `<td><span class="rank-number ${i<3?'top':''}">${i+1}</span></td><td><strong>${escapeHtml(row.rm)}</strong></td><td>${escapeHtml(row.base || '—')}</td><td>${escapeHtml(row.supervisor || '—')}</td><td class="num">${formatNum(row.count)}</td><td class="num">${formatNum(row.own)}</td><td class="num">${formatNum(row.franchise)}</td><td class="num money-cell">${formatCurrency(row.merchandise_value)}</td><td class="num rate-cell">${rateText}</td><td class="num"><span class="variation-pill ${vClass}">${vText}</span></td>`;
     const apply = async () => { $('rmFilter').value = row.rm; await loadDashboard(); };
     tr.addEventListener('click', apply); tr.addEventListener('keydown', e=>{ if(e.key==='Enter'||e.key===' '){e.preventDefault();apply();} }); body.appendChild(tr);
   });
@@ -283,6 +325,7 @@ async function loadBaseDashboard() {
     const payload = await api(`/api/dashboard-bases?${baseQueryString()}`);
     state.lastBaseDashboard = payload;
     renderBaseDashboard(payload);
+    if (state.activeView === 'bases') await loadRegionalRates();
   } finally { state.baseDashboardLoading = false; }
 }
 
@@ -360,7 +403,7 @@ function renderChartRmChips(){
   (state.filters.rm||[]).forEach(rm=>{const btn=document.createElement('button');btn.type='button';btn.className=`rm-filter-chip ${state.chartSelectedRms.has(rm)?'active':''}`;btn.textContent=rm;btn.addEventListener('click',async()=>{if(state.chartSelectedRms.has(rm))state.chartSelectedRms.delete(rm);else state.chartSelectedRms.add(rm);renderChartRmChips();await loadCharts();});root.appendChild(btn);});
 }
 function chartQueryString(){const p=new URLSearchParams();if($('chartStartDate').value)p.set('start_date',$('chartStartDate').value);if($('chartEndDate').value)p.set('end_date',$('chartEndDate').value);if($('chartRegionalFilter').value&&$('chartRegionalFilter').value!=='__all__')p.set('regional',$('chartRegionalFilter').value);if(state.chartSelectedRms.size)p.set('rms',[...state.chartSelectedRms].join('|'));return p.toString();}
-async function loadCharts(){try{const payload=await api(`/api/charts?${chartQueryString()}`);state.lastCharts=payload;renderCharts(payload);}catch(err){toast(t('chartLoadFailed',{msg:err.message}),'error');}}
+async function loadCharts(){try{const payload=await api(`/api/charts?${chartQueryString()}`);state.lastCharts=payload;renderCharts(payload);if(state.activeView==='charts')await loadRegionalRates();}catch(err){toast(t('chartLoadFailed',{msg:err.message}),'error');}}
 function renderCharts(data){const c=data.cards||{};$('chartKpiComplaints').textContent=formatNum(c.total);$('chartKpiValue').textContent=formatCurrency(c.value);$('chartKpiFranchise').textContent=formatNum(c.franchise);$('chartKpiOwn').textContent=formatNum(c.own);renderRmLineChart(data);}
 function renderRmLineChart(data){
   const root=$('rmLineChart');root.innerHTML='';const series=data.series||[];const dates=data.dates||[];
@@ -419,7 +462,7 @@ function validXlsx(file){return !!file&&file.name.toLowerCase().endsWith('.xlsx'
 function setupDropZone(zoneId,inputId,titleId){const zone=$(zoneId),input=$(inputId);input.addEventListener('change',()=>{const f=input.files[0];if(f)$(titleId).textContent=f.name;});['dragenter','dragover'].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();zone.classList.add('drag');}));['dragleave','drop'].forEach(evt=>zone.addEventListener(evt,e=>{e.preventDefault();zone.classList.remove('drag');}));zone.addEventListener('drop',e=>{const f=e.dataTransfer.files[0];if(!f)return;const dt=new DataTransfer();dt.items.add(f);input.files=dt.files;$(titleId).textContent=f.name;});}
 async function sendUpload(){const pnr=$('pnrFileInput').files[0],delivery=$('deliveryFileInput').files[0],key=$('adminKey').value.trim();if(!pnr||!delivery)return toast(t('selectBothXlsx'),'error');if(!validXlsx(pnr)||!validXlsx(delivery))return toast(t('xlsxOnly'),'error');if(!key)return toast(t('passwordRequired'),'error');const form=new FormData();form.append('pnr_file',pnr);form.append('delivery_file',delivery);form.append('admin_key',key);$('uploadProgressWrap').classList.add('show');$('uploadProgressBar').style.width='35%';$('uploadStatus').textContent=t('validatingImport');$('sendUpload').disabled=true;try{const result=await api('/api/upload',{method:'POST',body:form});$('uploadProgressBar').style.width='100%';toast(t('importedRows',{n:formatNum(result.rows),d:formatNum(result.delivery_rows)}),'success');closeModal();await loadFilters();await Promise.all([loadDashboard(),loadMeta()]);if(state.lastBaseDashboard||state.activeView==='bases')await loadBaseDashboard();if(state.activeView==='charts')await loadCharts();if(state.activeView==='editor')await loadEditorRows({preserveDirty:false});}catch(err){toast(err.message,'error');$('uploadProgressBar').style.width='0%';}finally{$('sendUpload').disabled=false;}}
 
-function switchView(view){state.activeView=view;document.querySelectorAll('.view-tab').forEach(b=>b.classList.toggle('active',b.dataset.view===view));document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));$(`${view}View`).classList.add('active');if(view==='editor'&&!state.editor.loaded)loadEditorRows({preserveDirty:false});if(view==='charts')loadCharts();if(view==='bases')loadBaseDashboard();}
+function switchView(view){state.activeView=view;document.querySelectorAll('.view-tab').forEach(b=>b.classList.toggle('active',b.dataset.view===view));document.querySelectorAll('.app-view').forEach(v=>v.classList.remove('active'));$(`${view}View`).classList.add('active');if(view==='editor'&&!state.editor.loaded)loadEditorRows({preserveDirty:false});else if(view==='editor')loadRegionalRates();if(view==='charts')loadCharts();if(view==='bases')loadBaseDashboard();if(view==='dashboard')loadRegionalRates();}
 function editorQueryString(){const p=new URLSearchParams();const pairs=[['start_date','editorStartDate'],['end_date','editorEndDate'],['regional','editorRegionalFilter'],['supervisor','editorSupervisorFilter'],['rm','editorRmFilter'],['station','editorStationFilter'],['base','editorBaseFilter'],['atendimento','editorAtendimentoFilter']];pairs.forEach(([k,id])=>{const v=$(id).value;if(v&&v!=='__all__')p.set(k,v);});if($('editorSearch').value.trim())p.set('q',$('editorSearch').value.trim());p.set('page',state.editor.page);p.set('page_size',$('editorPageSize').value);return p.toString();}
 function dirtyRows(){return [...document.querySelectorAll('#editorTableBody tr.dirty')];}
 function updateDirtyCount(){const n=dirtyRows().length;$('dirtyCount').textContent=n;$('editorSaveBtn').disabled=n===0;}
@@ -428,7 +471,7 @@ function appendEditorCell(tr,field,value,cls='',type='text'){const td=document.c
 function createEditorRow(record,isNew=false){const tr=document.createElement('tr');const id=isNew?`new-${Date.now()}-${Math.random().toString(16).slice(2)}`:String(record.id);tr.dataset.id=id;if(isNew)tr.classList.add('dirty','new-row');const idTd=document.createElement('td');idTd.className='sticky-col id-col';idTd.innerHTML=`<span class="editor-id ${isNew?'new':''}">${isNew?'NOVO':`#${record.id}`}</span>`;tr.appendChild(idTd);appendEditorCell(tr,'data',record.data,'date','date');appendEditorCell(tr,'filial',record.filial,'short');appendEditorCell(tr,'ticket_number',record.ticket_number,'medium');appendEditorCell(tr,'order_source',record.order_source,'long');appendEditorCell(tr,'base',record.base,'medium');appendEditorCell(tr,'driver',record.driver,'long');appendEditorCell(tr,'rm',record.rm,'medium');appendEditorCell(tr,'supervisor',record.supervisor,'medium');appendEditorCell(tr,'station',record.station||'Própria','medium');appendEditorCell(tr,'atendimento',record.atendimento,'medium');appendEditorCell(tr,'issue_l1',record.issue_l1,'long');appendEditorCell(tr,'issue_l2',record.issue_l2,'long');appendEditorCell(tr,'merchandise_value',record.merchandise_value,'money','number');const actionTd=document.createElement('td');actionTd.className='action-col';const del=document.createElement('button');del.type='button';del.className='delete-row';del.title=t('deleteRow');del.setAttribute('aria-label',t('deleteRow'));del.textContent='×';del.addEventListener('click',()=>deleteEditorRow(tr));actionTd.appendChild(del);tr.appendChild(actionTd);return tr;}
 function refreshEditorLabels(){document.querySelectorAll('.delete-row').forEach(btn=>{btn.title=t('deleteRow');btn.setAttribute('aria-label',t('deleteRow'));});if(state.editor.loaded){$('editorResultCount').textContent=t('recordsFound',{n:formatNum(state.editor.total)});$('editorPageLabel').textContent=t('pageOf',{page:state.editor.page,pages:state.editor.pages});}}
 function renderEditorRows(payload){const body=$('editorTableBody');body.innerHTML='';for(const row of payload.rows||[])body.appendChild(createEditorRow(row));if(!(payload.rows||[]).length){const tr=document.createElement('tr');const td=document.createElement('td');td.colSpan=15;td.className='empty-state';td.textContent=t('noEditorRows');tr.appendChild(td);body.appendChild(tr);}state.editor.page=payload.page||1;state.editor.pages=payload.pages||1;state.editor.total=payload.total||0;refreshEditorLabels();$('editorPrevBtn').disabled=state.editor.page<=1;$('editorNextBtn').disabled=state.editor.page>=state.editor.pages;updateDirtyCount();}
-async function loadEditorRows({preserveDirty=true}={}){if(state.editor.loading)return;if(preserveDirty&&dirtyRows().length){toast(t('saveOrDiscard'),'error');return;}state.editor.loading=true;try{const payload=await api(`/api/editor/rows?${editorQueryString()}`);renderEditorRows(payload);state.editor.loaded=true;}catch(err){toast(t('editorLoadFailed',{msg:err.message}),'error');}finally{state.editor.loading=false;}}
+async function loadEditorRows({preserveDirty=true}={}){if(state.editor.loading)return;if(preserveDirty&&dirtyRows().length){toast(t('saveOrDiscard'),'error');return;}state.editor.loading=true;try{const payload=await api(`/api/editor/rows?${editorQueryString()}`);renderEditorRows(payload);state.editor.loaded=true;if(state.activeView==='editor')await loadRegionalRates();}catch(err){toast(t('editorLoadFailed',{msg:err.message}),'error');}finally{state.editor.loading=false;}}
 function collectEditorRow(tr){const payload={id:tr.dataset.id.startsWith('new-')?null:Number(tr.dataset.id)};tr.querySelectorAll('[data-field]').forEach(input=>{payload[input.dataset.field]=input.value;});return payload;}
 function addEditorRow(){const record={data:$('editorEndDate').value||state.filters?.date_max||'',filial:$('editorRegionalFilter').value!=='__all__'?$('editorRegionalFilter').value:'',ticket_number:'',order_source:'',base:$('editorBaseFilter').value!=='__all__'?$('editorBaseFilter').value:'',driver:'',rm:$('editorRmFilter').value!=='__all__'?$('editorRmFilter').value:'',supervisor:$('editorSupervisorFilter').value!=='__all__'?$('editorSupervisorFilter').value:'',station:$('editorStationFilter').value!=='__all__'?$('editorStationFilter').value:'Própria',atendimento:$('editorAtendimentoFilter').value!=='__all__'?$('editorAtendimentoFilter').value:'',issue_l1:'',issue_l2:'',merchandise_value:0};const row=createEditorRow(record,true);$('editorTableBody').prepend(row);updateDirtyCount();$('editorTableBody').closest('.editor-table-wrap').scrollTop=0;}
 async function saveEditorRows(){const rows=dirtyRows();if(!rows.length)return toast(t('noChanges'));const key=$('editorAdminKey').value.trim();if(!key)return toast(t('passwordRequired'),'error');$('editorSaveBtn').disabled=true;try{const result=await api('/api/editor/save',{method:'POST',headers:{'Content-Type':'application/json'},body:JSON.stringify({admin_key:key,rows:rows.map(collectEditorRow)})});state.version=result.version??state.version;toast(t('savedRows',{n:result.saved}),'success');await loadFilters({preserve:true});await Promise.all([loadDashboard(),loadMeta()]);if(state.lastBaseDashboard)await loadBaseDashboard();if(state.lastCharts)await loadCharts();await loadEditorRows({preserveDirty:false});}catch(err){toast(err.message,'error');updateDirtyCount();}}

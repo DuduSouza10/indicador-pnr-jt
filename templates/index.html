@@ -39,6 +39,16 @@
       <button class="view-tab" data-view="editor" type="button" data-i18n="editorTab">Editar planilha</button>
     </nav>
 
+    <section class="global-regional-rate-wrap" aria-live="polite">
+      <article class="kpi-card regional-rate-card">
+        <div class="regional-rate-copy">
+          <div class="kpi-label" data-i18n="regionalPnrRate">TAXA PNR POR REGIONAL</div>
+          <div class="kpi-foot" id="regionalRatePeriod" data-i18n="regionalRateFormula">Reclamações ÷ Entregas × 10.000</div>
+        </div>
+        <div class="regional-rate-metrics" id="regionalRateMetrics"><span class="regional-rate-empty">—</span></div>
+      </article>
+    </section>
+
     <div id="dashboardView" class="app-view active">
       <section class="panel toolbar">
         <div class="toolbar-title">
@@ -89,7 +99,7 @@
             <div class="ranking-context"><span class="context-pill" id="rmCountBadge">0 RMs</span><span class="context-pill rate-date" id="rateDateBadge">—</span></div>
           </div>
           <div class="table-scroll"><table class="data-table rm-rate-table"><thead><tr>
-            <th>#</th><th>RM</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
+            <th>#</th><th>RM</th><th data-i18n="base">Base</th><th data-i18n="supervisor">Supervisor</th><th class="num">PNR</th><th class="num" data-i18n="ownShort">Própria</th><th class="num" data-i18n="franchise">Franquia</th><th class="num" data-i18n="merchandiseValue">Valor da mercadoria</th><th class="num" data-i18n="pnrRate">Taxa PNR</th><th class="num" data-i18n="variationD1">Variação D-1</th>
           </tr></thead><tbody id="rmTableBody"></tbody></table></div>
         </article>
 
