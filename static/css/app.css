@@ -140,6 +140,7 @@ button { cursor: pointer; }
 .spark-date { color: #5e5e63; font-size: 8px; text-align: center; transform: rotate(-50deg); transform-origin: center; white-space: nowrap; margin-bottom: 4px; }
 
 footer { display: flex; justify-content: space-between; gap: 16px; color: #55555a; font-size: 10px; padding: 22px 4px 0; }
+.developer-credit { margin-left: auto; opacity: .68; font-size: 9px; letter-spacing: .01em; white-space: nowrap; text-align: right; }
 
 .modal-backdrop { position: fixed; inset: 0; z-index: 50; display: none; place-items: center; padding: 24px; background: rgba(0,0,0,.78); backdrop-filter: blur(12px); }
 .modal-backdrop.open, .modal-backdrop.show { display: grid; }
@@ -204,7 +205,8 @@ footer { display: flex; justify-content: space-between; gap: 16px; color: #55555
   .wide-field { grid-column: auto; }
   .kpi-grid { grid-template-columns: 1fr; }
   .primary-kpi { grid-column: auto; }
-  footer { flex-direction: column; }
+  footer { flex-direction: column; align-items: stretch; }
+  .developer-credit { margin-left: 0; align-self: flex-end; }
 }
 
 /* ===== Views / editor da base ===== */
